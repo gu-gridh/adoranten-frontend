@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import 'vue3-carousel/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
+import Header from '../components/Header.vue'
 
 const description = ref('Loading...')
 const issues = ref([])
@@ -44,6 +45,7 @@ onMounted(async () => {
 
 <template>
   <div>
+    <Header />
     <!-- render the home page description -->
     <div v-html="description"></div>
     
