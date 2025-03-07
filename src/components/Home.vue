@@ -1,9 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import 'vue3-carousel/carousel.css'
+import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 
 const description = ref('Loading...')
 const issues = ref([])
 const imageBaseUrl = 'http://127.0.0.1:8000'
+
+const carouselConfig = {
+  itemsToShow: 2.5,
+  wrapAround: true
+}
 
 onMounted(async () => {
   //fetch home page data
@@ -40,39 +47,42 @@ onMounted(async () => {
     <!-- render the home page description -->
     <div v-html="description"></div>
     
-    <!-- render the list of issues -->
+    <!-- Render the carousel -->
     <div v-if="issues.length">
       <h2>Issues</h2>
-      <ul>
-        <li v-for="issue in issues" :key="issue.id">
-          <h3>{{ issue.issue_name }} ({{ issue.issue_year }})</h3>
-          <img 
-            v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url" 
-            :src="imageBaseUrl + issue.cover_image.meta.download_url" 
-            alt="Issue Cover"
-          >
-          <p v-if="issue.pdf_file">
-            <a :href="issue.pdf_file" target="_blank">Download PDF</a>
-          </p>
-        </li>
-      </ul>
+      <Carousel v-bind="carouselConfig">
+        <Slide v-for="issue in issues" :key="issue.id">
+          <div class="carousel__item">
+            <img 
+              v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
+              :src="imageBaseUrl + issue.cover_image.meta.download_url"
+              alt="Issue Cover"
+            />
+            <h3>{{ issue.issue_name }} ({{ issue.issue_year }})</h3>
+            <p v-if="issue.pdf_file">
+              <a :href="issue.pdf_file" target="_blank">Download PDF</a>
+            </p>
+          </div>
+        </Slide>
+        <template #addons>
+          <Navigation />
+          <Pagination />
+        </template>
+      </Carousel>
+    </div>
+    <div v-else>
+      <p>No issues found</p>
     </div>
   </div>
 </template>
 
 <style scoped>
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 20px;
+.carousel__item {
+  text-align: center;
 }
 
 img {
-  max-width: 200px;
-  display: block;
+  max-width: 100%;
   margin-bottom: 10px;
 }
 </style>
