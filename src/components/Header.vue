@@ -17,6 +17,7 @@
 <style scoped>
 .header-tabs {
   padding: 10px;
+  margin-right: 5%;
 }
 
 .header-tabs nav ul {

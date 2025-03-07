@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue'
 import 'vue3-carousel/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
-import Header from '../components/Header.vue'
 
 const description = ref('Loading...')
 const issues = ref([])
@@ -44,8 +43,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <Header />
+  <div id="home-container">
     <!-- render the home page description -->
     <div v-html="description"></div>
     
@@ -78,6 +76,10 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+#home-container {
+  margin: 0 10%;
+}
+
 .carousel__item {
   text-align: center;
 }
