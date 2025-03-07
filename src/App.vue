@@ -1,11 +1,10 @@
 <script setup>
-import Home from './components/Home.vue'
 </script>
 
 <template>
-  <div>
+  <div id="app">
+    <router-view></router-view>
   </div>
-  <Home />
 </template>
 
 <style scoped>
