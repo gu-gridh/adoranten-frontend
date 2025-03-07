@@ -52,19 +52,16 @@ onMounted(async () => {
       <h2>Issues</h2>
       <Carousel v-bind="carouselConfig">
         <Slide v-for="issue in issues" :key="issue.id">
-          <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
             <div class="carousel__item">
-              <img 
-                v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
-                :src="imageBaseUrl + issue.cover_image.meta.download_url"
-                alt="Issue Cover"
-              />
+              <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
+                <img 
+                  v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
+                  :src="imageBaseUrl + issue.cover_image.meta.download_url"
+                  alt="Issue Cover"
+                />
+              </router-link>
               <h3>{{ issue.issue_name }} ({{ issue.issue_year }})</h3>
-              <p v-if="issue.pdf_file">
-                <a :href="issue.pdf_file" target="_blank">Download PDF</a>
-              </p>
             </div>
-          </router-link>
         </Slide>
         <template #addons>
           <Navigation />
@@ -84,7 +81,7 @@ onMounted(async () => {
 }
 
 img {
-  max-width: 100%;
+  max-width: 50%;
   margin-bottom: 10px;
 }
 </style>
