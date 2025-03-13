@@ -1,13 +1,29 @@
 <script setup>
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
+
+const navigateTo = (path) => {
+  router.push(path);
+};
 </script>
 
 <template>
   <header class="header-tabs">
     <nav>
       <ul>
-        <li>Home</li>
+        <li 
+          :class="{ active: route.path === '/' }" 
+          @click="navigateTo('/')">
+          Home
+        </li>
         <li>About</li>
-        <li>Search</li>
+        <li 
+          :class="{ active: route.path === '/search' }" 
+          @click="navigateTo('/search')">
+          Search
+        </li>
         <li>Accessibility</li>
       </ul>
     </nav>
@@ -32,5 +48,15 @@
   margin-left: 20px;
   font-weight: 500;
   color: #333;
+}
+
+.header-tabs nav ul li:hover {
+  color: #666;
+}
+
+.header-tabs nav ul li.active {
+  color: #000;
+  font-weight: 600;
+  border-bottom: 2px solid #000;
 }
 </style>
