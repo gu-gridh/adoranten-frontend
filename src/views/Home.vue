@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import 'vue3-carousel/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
+import linkArrow from '/src/assets/link-arrow.png'
 
 const description = ref('Loading...')
 const issues = ref([])
@@ -60,7 +61,10 @@ onMounted(async () => {
                 alt="Issue Cover"
               />
               <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
-                <button class="view-button">View Issue</button>
+                <button class="view-button">
+                  <span>View Issue</span>
+                  <img :src="linkArrow" alt="Arrow Icon" class="arrow-icon" />
+                </button>
               </router-link>
             </div>
             <h3>{{ issue.issue_name }} ({{ issue.issue_year }})</h3>
@@ -111,6 +115,14 @@ img {
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arrow-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .image-container:hover .view-button {
