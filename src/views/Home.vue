@@ -46,22 +46,25 @@ onMounted(async () => {
   <div id="home-container">
     <!-- render the home page description -->
     <div v-html="description"></div>
-    
+
     <!-- Render the carousel -->
     <div v-if="issues.length">
       <h2>Issues</h2>
       <Carousel v-bind="carouselConfig">
         <Slide v-for="issue in issues" :key="issue.id">
-            <div class="carousel__item">
+          <div class="carousel__item">
+            <div class="image-container">
+              <img 
+              v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
+                :src="imageBaseUrl + issue.cover_image.meta.download_url"
+                alt="Issue Cover"
+              />
               <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
-                <img 
-                  v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
-                  :src="imageBaseUrl + issue.cover_image.meta.download_url"
-                  alt="Issue Cover"
-                />
+                <button class="view-button">View Issue</button>
               </router-link>
-              <h3>{{ issue.issue_name }} ({{ issue.issue_year }})</h3>
             </div>
+            <h3>{{ issue.issue_name }} ({{ issue.issue_year }})</h3>
+          </div>
         </Slide>
         <template #addons>
           <Navigation />
@@ -82,10 +85,35 @@ onMounted(async () => {
 
 .carousel__item {
   text-align: center;
+  position: relative;
 }
 
 img {
   max-width: 50%;
-  margin-bottom: 10px;
+  border-radius: 5px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.image-container:hover img {
+  transform: scale(1.05);
+}
+
+.view-button {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.image-container:hover .view-button {
+  opacity: 1;
 }
 </style>
