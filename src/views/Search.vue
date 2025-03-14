@@ -48,15 +48,17 @@ watch(searchTerm, (newValue) => {
  
  <template>
   <div>
-    <h1>Hi, let's search.</h1>
     <input v-model="searchTerm" type="text" placeholder="Enter search term..." />
 
     <div v-if="results.length">
       <h2>Search Results:</h2>
-        <div v-for="item in results" :key="item.id">
+      <div v-for="item in results" :key="item.id">
+        <router-link :to="{ name: 'Issue', params: { id: item.id } }">
           {{ item.title }}
-        </div>
+        </router-link>
+      </div>
     </div>
+    
     <div v-else>
       <p>No results found.</p>
     </div>

@@ -63,7 +63,7 @@ onMounted(async () => {
               <h3>{{ issue.issue_name }} ({{ issue.issue_year }})</h3>
             </div>
         </Slide>
-        <template>
+        <template #addons>
           <Navigation />
           <Pagination />
         </template>
