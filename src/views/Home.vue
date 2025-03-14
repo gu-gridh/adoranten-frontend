@@ -3,14 +3,21 @@ import { ref, onMounted } from 'vue'
 import 'vue3-carousel/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import linkArrow from '/src/assets/link-arrow.png'
+import hamburger from '/src/assets/hamburger.svg'
+import Overlay from '/src/views/Overlay.vue'
 
 const description = ref('Loading...')
 const issues = ref([])
 const imageBaseUrl = 'http://127.0.0.1:8000'
+const showOverlay = ref(false)
 
 const carouselConfig = {
   itemsToShow: 2.5,
   wrapAround: true
+}
+
+const toggleOverlay = () => {
+  showOverlay.value = !showOverlay.value
 }
 
 onMounted(async () => {
@@ -45,6 +52,10 @@ onMounted(async () => {
 
 <template>
   <div id="home-container">
+    <button class="toggle-overlay-btn" @click="toggleOverlay">
+        <img :src="hamburger" alt="Menu" class="hamburger-icon" />
+    </button>
+
     <!-- render the home page description -->
     <div v-html="description"></div>
 
@@ -56,7 +67,7 @@ onMounted(async () => {
           <div class="carousel__item">
             <div class="image-container">
               <img 
-              v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
+                v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
                 :src="imageBaseUrl + issue.cover_image.meta.download_url"
                 alt="Issue Cover"
               />
@@ -79,12 +90,26 @@ onMounted(async () => {
     <div v-else>
       <p>No issues found</p>
     </div>
+
+    <Overlay :show="showOverlay" :issues="issues" @close="toggleOverlay" />
   </div>
 </template>
 
 <style scoped>
 #home-container {
   margin: 0 10%;
+}
+
+.toggle-overlay-btn {
+  position: absolute;
+  top: 100px;
+  right: 80px;
+  background: rgb(239, 239, 239);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0;
 }
 
 .carousel__item {
@@ -123,6 +148,11 @@ img {
 .arrow-icon {
   width: 16px;
   height: 16px;
+}
+
+.hamburger-icon {
+  width: 40px;
+  height: 40px;
 }
 
 .image-container:hover .view-button {
