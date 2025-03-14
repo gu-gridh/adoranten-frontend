@@ -6,18 +6,17 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const articles = ref([])
+const issue = ref([])
 const imageBaseUrl = 'http://127.0.0.1:8000'
 const issueId = route.params.id
-
-//http://127.0.0.1:8000/api/v2/pages/?type=journal.IssuePage&id=18&fields=*
 
 onMounted(async () => {
   //fetch issue article data
   try {
     // get the issue ID from the URL params
 
-    const response = await fetch(`http://127.0.0.1:8000/api/v2/pages/?type=journal.ArticlePage&child_of=${issueId}&fields=*`)
-    const data = await response.json()
+    const responseArticles = await fetch(`http://127.0.0.1:8000/api/v2/pages/?type=journal.ArticlePage&child_of=${issueId}&fields=*`)
+    const data = await responseArticles.json()
     if (data.items && data.items.length > 0) {
         articles.value = data.items
   } else {
@@ -26,11 +25,31 @@ onMounted(async () => {
   } catch (error) {
     console.error('error fetching articles:', error)
   }
+
+  //fetch issue full pdf
+  try {
+    // get the issue ID from the URL params
+
+    const responseIssue = await fetch(`http://127.0.0.1:8000/api/v2/pages/?type=journal.IssuePage&id=${issueId}&fields=*`)
+    const data = await responseIssue.json()
+    if (data.items && data.items.length > 0) {
+        issue.value = data.items[0]
+  } else {
+        issue.value = []
+  }
+  } catch (error) {
+    console.error('error fetching issue full pdf:', error)
+  }
 })
 </script>
 
 <template>
   <div>
+
+    <h3><a v-if="issue.pdf_file" 
+   :href="issue.pdf_file" 
+   target="_blank">Read full {{ issue.title }} PDF</a></h3>
+
     <h2>Articles</h2>
     
     <p v-if="!articles.length">No articles found.</p>
