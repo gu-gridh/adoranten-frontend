@@ -14,7 +14,7 @@ onMounted(async () => {
     // get the issue ID from the URL params
     const issueId = route.params.id
 
-    const response = await fetch(`http://127.0.0.1:8000/api/v2/pages/?type=journal.ArticlePage&child_of=${issueId}&fields=image,article_title,article_description,pdf_file`)
+    const response = await fetch(`http://127.0.0.1:8000/api/v2/pages/?type=journal.ArticlePage&child_of=${issueId}&fields=*`)
     const data = await response.json()
     if (data.items && data.items.length > 0) {
         articles.value = data.items

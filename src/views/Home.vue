@@ -29,7 +29,7 @@ onMounted(async () => {
 
   //fetch issues data
   try {
-    const responseIssues = await fetch('http://127.0.0.1:8000/api/v2/pages/?type=journal.IssuePage&fields=issue_name,issue_year,cover_image,pdf_file')
+    const responseIssues = await fetch('http://127.0.0.1:8000/api/v2/pages/?type=journal.IssuePage&fields=*')
     const dataIssues = await responseIssues.json()
     if (dataIssues.items && dataIssues.items.length > 0) {
       issues.value = dataIssues.items
@@ -63,7 +63,7 @@ onMounted(async () => {
               <h3>{{ issue.issue_name }} ({{ issue.issue_year }})</h3>
             </div>
         </Slide>
-        <template #addons>
+        <template>
           <Navigation />
           <Pagination />
         </template>
