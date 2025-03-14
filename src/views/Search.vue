@@ -53,11 +53,9 @@ watch(searchTerm, (newValue) => {
 
     <div v-if="results.length">
       <h2>Search Results:</h2>
-      <ul>
-        <li v-for="item in results" :key="item.id">
+        <div v-for="item in results" :key="item.id">
           {{ item.title }}
-        </li>
-      </ul>
+        </div>
     </div>
     <div v-else>
       <p>No results found.</p>
