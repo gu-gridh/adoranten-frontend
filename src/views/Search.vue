@@ -6,10 +6,13 @@ const searchTerm = ref('')
 const results = ref([])
 
 onMounted(async () => {
-  //fetch search page data
+  const start = performance.now()
+
   try {
     const responseSearch = await fetch('http://127.0.0.1:8000/api/v2/pages/?type=home.SearchPage&fields=description')
     const dataSearch = await responseSearch.json()
+    const end = performance.now()
+    console.log(`on mounted eager load took ${(end - start).toFixed(2)} ms`)
     if (dataSearch.items && dataSearch.items.length > 0) {
       description.value = dataSearch.items[0].description
     } else {
@@ -27,14 +30,18 @@ async function fetchResults(query) {
     return
   }
 
+  const start = performance.now()
+
   try {
     const url = `http://localhost:8000/api/v2/pages/?type=journal.IssuePage&search=${encodeURIComponent(query)}`
     const response = await fetch(url)
-    console.log(response);
     if (!response.ok) {
       throw new Error('network response was not ok')
     }
     const data = await response.json()
+    const end = performance.now()
+    console.log(`lazy load search for... "${query}" took ${(end - start).toFixed(2)} ms`)
+
     results.value = data.items || []
   } catch (error) {
     console.error('error fetching data:', error)
@@ -44,7 +51,7 @@ async function fetchResults(query) {
 watch(searchTerm, (newValue) => {
   fetchResults(newValue)
 })
- </script>
+</script>
  
  <template>
   <div>
