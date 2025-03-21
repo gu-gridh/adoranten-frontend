@@ -7,7 +7,6 @@ const route = useRoute()
 
 const articles = ref([])
 const issue = ref([])
-const imageBaseUrl = 'https://shfa.dh.gu.se/wagtail'
 const issueId = route.params.id
 
 onMounted(async () => {
@@ -59,7 +58,7 @@ onMounted(async () => {
       <li v-for="article in articles" :key="article.id">
         <img 
           v-if="article.image?.meta?.download_url" 
-          :src="imageBaseUrl + article.image.meta.download_url" 
+          :src="article.image.meta.download_url" 
           :alt="article.article_title"
         >
         <h3>{{ article.article_title }}</h3>
