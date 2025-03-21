@@ -18,13 +18,15 @@ const navigateTo = (path) => {
           @click="navigateTo('/')">
           Home
         </li>
-        <li>About</li>
+        <li :class="{ active: route.path === '/about' }" 
+        @click="navigateTo('/about')">About</li>
         <li 
           :class="{ active: route.path === '/search' }" 
           @click="navigateTo('/search')">
           Search
         </li>
-        <li>Accessibility</li>
+        <li :class="{ active: route.path === '/accessibility' }" 
+        @click="navigateTo('/accessibility')">Accessibility</li>
       </ul>
     </nav>
   </header>
