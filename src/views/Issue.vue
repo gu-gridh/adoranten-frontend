@@ -50,6 +50,7 @@ onMounted(async () => {
    target="_blank">Read full {{ issue.title }} PDF</a></h3>
 
     <h2>Articles</h2>
+    <div class="container">
     
     <p v-if="!articles.length">No articles found.</p>
     
@@ -61,39 +62,64 @@ onMounted(async () => {
           :src="article.image.meta.download_url" 
           :alt="article.article_title"
         >
-        <h3>{{ article.article_title }}</h3>
+        <div class="content">
+          <h3>{{ article.article_title }}</h3>
         <div v-html="article.article_description" class="article-description"></div>
-        <a v-if="article.pdf_file" :href="article.pdf_file" target="_blank">Read PDF</a>
+        <a v-if="article.pdf_file" :href="article.pdf_file" target="_blank" class="pdf-link">Read PDF</a>
+      </div>
       </li>
     </ul>
+  </div>
   </div>
 </template>
 
 <style scoped>
+
+.container {
+  flex-direction: column;
+  padding: 20px;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
 }
 
 li {
-  text-align: center;
   margin-bottom: 20px;
   display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.content {
+  display: flex;
   flex-direction: column;
-  align-items: center;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.content > * {
+  margin: 0 0 10px 0;
+}
+
+.pdf-link {
+  margin-top: auto;
+  align-self: flex-start;
 }
 
 img {
-  max-width: 50%;
+  width: 30%;
 }
 
 .article-description {
-  margin: 1rem 0;
   line-height: 1.6;
   max-width: 800px;
   font-size: 1rem;
   color: #333;
   text-align: left;
   width: 100%;
+  flex: 1;
 }
 </style>
