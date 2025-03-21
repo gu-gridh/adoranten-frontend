@@ -8,7 +8,6 @@ import Overlay from '/src/views/Overlay.vue'
 
 const description = ref('Loading...')
 const issues = ref([])
-const imageBaseUrl = 'https://shfa.dh.gu.se/wagtail'
 const showOverlay = ref(false)
 
 const carouselConfig = {
@@ -68,7 +67,7 @@ onMounted(async () => {
             <div class="image-container">
               <img 
                 v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
-                :src="imageBaseUrl + issue.cover_image.meta.download_url"
+                :src="issue.cover_image.meta.download_url"
                 alt="Issue Cover"
               />
               <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
