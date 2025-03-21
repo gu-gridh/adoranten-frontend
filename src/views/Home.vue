@@ -8,7 +8,7 @@ import Overlay from '/src/views/Overlay.vue'
 
 const description = ref('Loading...')
 const issues = ref([])
-const imageBaseUrl = 'http://127.0.0.1:8000'
+const imageBaseUrl = 'https://shfa.dh.gu.se/wagtail'
 const showOverlay = ref(false)
 
 const carouselConfig = {
@@ -23,7 +23,7 @@ const toggleOverlay = () => {
 onMounted(async () => {
   //fetch home page data
   try {
-    const responseHome = await fetch('http://127.0.0.1:8000/api/v2/pages/?type=home.HomePage&fields=description')
+    const responseHome = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.HomePage&fields=description')
     const dataHome = await responseHome.json()
     if (dataHome.items && dataHome.items.length > 0) {
       description.value = dataHome.items[0].description
@@ -37,7 +37,7 @@ onMounted(async () => {
 
   //fetch issues data
   try {
-    const responseIssues = await fetch('http://127.0.0.1:8000/api/v2/pages/?type=journal.IssuePage&fields=*')
+    const responseIssues = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&fields=*')
     const dataIssues = await responseIssues.json()
     if (dataIssues.items && dataIssues.items.length > 0) {
       issues.value = dataIssues.items

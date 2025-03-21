@@ -7,7 +7,7 @@ const route = useRoute()
 
 const articles = ref([])
 const issue = ref([])
-const imageBaseUrl = 'http://127.0.0.1:8000'
+const imageBaseUrl = 'https://shfa.dh.gu.se/wagtail'
 const issueId = route.params.id
 
 onMounted(async () => {
@@ -15,7 +15,7 @@ onMounted(async () => {
   try {
     // get the issue ID from the URL params
 
-    const responseArticles = await fetch(`http://127.0.0.1:8000/api/v2/pages/?type=journal.ArticlePage&child_of=${issueId}&fields=*`)
+    const responseArticles = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.ArticlePage&child_of=${issueId}&fields=*`)
     const data = await responseArticles.json()
     if (data.items && data.items.length > 0) {
         articles.value = data.items
@@ -30,7 +30,7 @@ onMounted(async () => {
   try {
     // get the issue ID from the URL params
 
-    const responseIssue = await fetch(`http://127.0.0.1:8000/api/v2/pages/?type=journal.IssuePage&id=${issueId}&fields=*`)
+    const responseIssue = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&id=${issueId}&fields=*`)
     const data = await responseIssue.json()
     if (data.items && data.items.length > 0) {
         issue.value = data.items[0]

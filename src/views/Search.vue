@@ -9,7 +9,7 @@ onMounted(async () => {
   const start = performance.now()
 
   try {
-    const responseSearch = await fetch('http://127.0.0.1:8000/api/v2/pages/?type=home.SearchPage&fields=description')
+    const responseSearch = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.SearchPage&fields=description')
     const dataSearch = await responseSearch.json()
     const end = performance.now()
     console.log(`on mounted eager load took ${(end - start).toFixed(2)} ms`)
@@ -33,7 +33,7 @@ async function fetchResults(query) {
   const start = performance.now()
 
   try {
-    const url = `http://localhost:8000/api/v2/pages/?type=journal.IssuePage&search=${encodeURIComponent(query)}`
+    const url = `https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&search=${encodeURIComponent(query)}`
     const response = await fetch(url)
     if (!response.ok) {
       throw new Error('network response was not ok')
