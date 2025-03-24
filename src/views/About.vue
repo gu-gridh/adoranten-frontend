@@ -82,7 +82,7 @@ flex: 1;
 margin-bottom: 10px;
 }
 
-input, textarea, button {
+input, textarea {
 width: 100%;
 padding: 6px;
 border: 1px solid #ccc;
@@ -97,12 +97,14 @@ resize: none;
 }
 
 button {
+width: 100%;
 padding: 10px;
 background: #030303;
 color: #fff;
 border: none;
 border-radius: 3px;
 cursor: pointer;
+font-family: system-ui, Helvetica, Arial, sans-serif;;
 }
 
 button:hover {
