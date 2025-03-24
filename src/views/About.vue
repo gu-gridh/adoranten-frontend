@@ -33,7 +33,7 @@
   
   <template>
     <div class="contact-form">
-      <h2>Contact Me</h2>
+      <h2>Contact Us</h2>
       <form @submit.prevent="handleSubmit">
         <div class="form-group-name">
         <div>
