@@ -5,6 +5,7 @@ const description = ref('Loading...')
 const searchTerm = ref('')
 const allArticles = ref([]) //holds the full list of articles fetched on mount
 const results = ref([]) //filtered results that we display
+const useLazyLoading = ref(false) // toggle between eager and lazy loading implementations
 
 onMounted(async () => {
   const start = performance.now()
@@ -43,14 +44,35 @@ onMounted(async () => {
 })
 
 //filter local articles array when searchTerm changes
-watch(searchTerm, (newValue) => {
-  if (!newValue) {
-    //if search is empty, show all
-    results.value = allArticles.value
+watch(searchTerm, async (newValue) => {
+  if (useLazyLoading.value) {
+    // Lazy loading implementation
+    const start = performance.now()
+    
+    try {
+      const response = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&search=${encodeURIComponent(newValue)}`)
+      if (!response.ok) throw new Error('Network response was not ok')
+      const data = await response.json()
+      results.value = data.items || []
+      
+      const end = performance.now()
+      console.log(`Lazy load search took ${(end - start).toFixed(2)} ms`)
+    } catch (error) {
+      console.error('Error in lazy loading search:', error)
+      results.value = []
+    }
   } else {
-    results.value = allArticles.value.filter(item =>
-      item.title.toLowerCase().includes(newValue.toLowerCase())
-    )
+    // Use original eager loading implementation, with added performance check
+    if (!newValue) {
+      results.value = allArticles.value
+    } else {
+      const start = performance.now()
+      results.value = allArticles.value.filter(item =>
+        item.title.toLowerCase().includes(newValue.toLowerCase())
+      )
+      const end = performance.now()
+      console.log(`Eager load filtering took ${(end - start).toFixed(2)} ms`)
+    }
   }
 })
 </script>
