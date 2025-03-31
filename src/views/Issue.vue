@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 
 // access the current route
@@ -39,6 +39,15 @@ onMounted(async () => {
   } catch (error) {
     console.error('error fetching issue full pdf:', error)
   }
+
+  // after data is loaded, scroll to hash if present
+  await nextTick()
+  if (route.hash) {
+    const element = document.querySelector(route.hash)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 })
 </script>
 
@@ -56,7 +65,7 @@ onMounted(async () => {
     
     <!-- Render the articles -->
     <ul v-else>
-      <li v-for="article in articles" :key="article.id">
+      <li v-for="article in articles" :key="article.id" :id="'article-' + article.id">
         <img 
           v-if="article.image?.meta?.download_url" 
           :src="article.image.meta.download_url" 
