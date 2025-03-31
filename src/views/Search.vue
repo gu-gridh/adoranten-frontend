@@ -7,6 +7,43 @@ const allArticles = ref([]) //holds the full list of articles fetched on mount
 const results = ref([]) //filtered results that we display
 const useLazyLoading = ref(false) // toggle between eager and lazy loading implementations
 
+// function for processing articles to match the structure needed for display
+const processArticles = (articlesData, allArticles) => {
+  return articlesData.items.map(article => {
+    const articleUrl = article.meta?.html_url || '';
+    let issueId = null;
+    
+    // try to find issue ID by matching with known issues
+    if (articleUrl) {
+      // extract issue slug from article URL
+      const urlParts = articleUrl.split('/');
+      const publicationsIndex = urlParts.indexOf('publications');
+      
+      if (publicationsIndex !== -1 && urlParts.length > publicationsIndex + 1) {
+        const issueSlug = urlParts[publicationsIndex + 1];
+        
+        // look for matching issue by slug
+        const matchingIssue = allArticles.find(
+          item => !item.isArticle && item.meta.slug === issueSlug
+        );
+        
+        if (matchingIssue) {
+          issueId = matchingIssue.id;
+        }
+      }
+    }
+    
+    return {
+      id: article.id,
+      title: article.title,
+      isArticle: true,
+      meta: article.meta,
+      articleUrl: articleUrl,
+      issueId: issueId
+    };
+  });
+};
+
 onMounted(async () => {
   const start = performance.now()
 
@@ -46,12 +83,7 @@ onMounted(async () => {
     const articlesData = await articlesResponse.json()
 
     // process articles to match the structure needed for display
-    const processedArticles = articlesData.items.map(article => ({
-      id: article.id,
-      title: article.article_title || article.title || `Article ${article.id}`,
-      isArticle: true,
-      meta: article.meta
-    }))
+    const processedArticles = processArticles(articlesData, allArticles.value)
     
     // add articles to all articles
     allArticles.value = [...allArticles.value, ...processedArticles]
@@ -82,13 +114,8 @@ watch(searchTerm, async (newValue) => {
       const articlesResponse = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.ArticlePage&search=${encodeURIComponent(newValue)}`)
       const articlesData = await articlesResponse.json()
       
-      // Process articles
-      const processedArticles = articlesData.items.map(article => ({
-        id: article.id,
-        title: article.article_title || article.title || `Article ${article.id}`,
-        isArticle: true,
-        meta: article.meta
-      }))
+      // process articles to match the structure needed for display
+      const processedArticles = processArticles(articlesData, issuesData.items)
       
       // Combine results
       results.value = [...issuesData.items, ...processedArticles]
@@ -134,9 +161,9 @@ watch(searchTerm, async (newValue) => {
     </router-link>
     
     <!-- For articles -->
-    <a v-else :href="item.meta.html_url" target="_blank">
-      {{ item.title }} (Article)
-    </a>
+    <router-link v-else-if="item.issueId" :to="{ name: 'Issue', params: { id: item.issueId }, hash: '#article-' + item.id }">
+  {{ item.title }} (Article)
+    </router-link>
       </div>
     </div>
 
