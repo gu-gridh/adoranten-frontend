@@ -115,7 +115,7 @@ watch(searchTerm, async (newValue) => {
       const articlesData = await articlesResponse.json()
       
       // process articles to match the structure needed for display
-      const processedArticles = processArticles(articlesData, issuesData.items)
+      const processedArticles = processArticles(articlesData, allArticles.value)
       
       // Combine results
       results.value = [...issuesData.items, ...processedArticles]
