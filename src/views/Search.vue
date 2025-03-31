@@ -37,6 +37,25 @@ onMounted(async () => {
 
     //store in all articles
     allArticles.value = data.items || []
+
+    // fetch all articles
+    const articlesResponse = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.ArticlePage')
+    if (!articlesResponse.ok) {
+      throw new Error('network response was not ok')
+    }
+    const articlesData = await articlesResponse.json()
+
+    // process articles to match the structure needed for display
+    const processedArticles = articlesData.items.map(article => ({
+      id: article.id,
+      title: article.article_title || article.title || `Article ${article.id}`,
+      isArticle: true,
+      meta: article.meta
+    }))
+    
+    // add articles to all articles
+    allArticles.value = [...allArticles.value, ...processedArticles]
+
     results.value = allArticles.value
   } catch (error) {
     console.error('Error fetching IssuePages:', error)
@@ -49,11 +68,30 @@ watch(searchTerm, async (newValue) => {
     // Lazy loading implementation
     const start = performance.now()
     
+    if (!newValue || newValue.length < 2) {
+      results.value = newValue ? [] : allArticles.value
+      return
+    }
+    
     try {
-      const response = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&search=${encodeURIComponent(newValue)}`)
-      if (!response.ok) throw new Error('Network response was not ok')
-      const data = await response.json()
-      results.value = data.items || []
+      // Fetch issues
+      const issuesResponse = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&search=${encodeURIComponent(newValue)}`)
+      const issuesData = await issuesResponse.json()
+      
+      // Fetch articles
+      const articlesResponse = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.ArticlePage&search=${encodeURIComponent(newValue)}`)
+      const articlesData = await articlesResponse.json()
+      
+      // Process articles
+      const processedArticles = articlesData.items.map(article => ({
+        id: article.id,
+        title: article.article_title || article.title || `Article ${article.id}`,
+        isArticle: true,
+        meta: article.meta
+      }))
+      
+      // Combine results
+      results.value = [...issuesData.items, ...processedArticles]
       
       const end = performance.now()
       console.log(`Lazy load search took ${(end - start).toFixed(2)} ms`)
@@ -67,9 +105,10 @@ watch(searchTerm, async (newValue) => {
       results.value = allArticles.value
     } else {
       const start = performance.now()
-      results.value = allArticles.value.filter(item =>
-        item.title.toLowerCase().includes(newValue.toLowerCase())
-      )
+      results.value = allArticles.value.filter(item => {
+        // filter all items (both issues and articles) using the same title criteria
+        return item.title.toLowerCase().includes(newValue.toLowerCase())
+      })
       const end = performance.now()
       console.log(`Eager load filtering took ${(end - start).toFixed(2)} ms`)
     }
@@ -89,9 +128,15 @@ watch(searchTerm, async (newValue) => {
         v-for="item in results" 
         :key="item.id"
       >
-        <router-link :to="{ name: 'Issue', params: { id: item.id } }">
-          {{ item.title }}
-        </router-link>
+    <!-- For normal issues -->
+    <router-link v-if="!item.isArticle" :to="{ name: 'Issue', params: { id: item.id } }">
+      {{ item.title }}
+    </router-link>
+    
+    <!-- For articles -->
+    <a v-else :href="item.meta.html_url" target="_blank">
+      {{ item.title }} (Article)
+    </a>
       </div>
     </div>
 
