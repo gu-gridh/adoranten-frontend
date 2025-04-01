@@ -51,9 +51,6 @@ onMounted(async () => {
     const responseSearch = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.SearchPage&fields=description')
     const dataSearch = await responseSearch.json()
 
-    const end = performance.now()
-    console.log(`on mounted eager load took ${(end - start).toFixed(2)} ms`)
-
     if (dataSearch.items && dataSearch.items.length > 0) {
       description.value = dataSearch.items[0].description
     } else {
@@ -63,6 +60,9 @@ onMounted(async () => {
     console.error('error fetching search page data:', error)
     description.value = 'error loading search page content'
   }
+
+
+  if (!useLazyLoading.value) {
 
   //fetch all issues
   try {
@@ -89,9 +89,18 @@ onMounted(async () => {
     allArticles.value = [...allArticles.value, ...processedArticles]
 
     results.value = allArticles.value
+
+    const end = performance.now()
+    console.log(`Eager load initial rendering took ${(end - start).toFixed(2)} ms`)
+
   } catch (error) {
     console.error('Error fetching IssuePages:', error)
   }
+  } else {
+        const end = performance.now()
+        console.log(`Lazy load initial rendering took ${(end - start).toFixed(2)} ms`)
+      }
+  
 })
 
 //filter local articles array when searchTerm changes
