@@ -51,25 +51,21 @@ onMounted(async () => {
 
 <template>
   <div id="home-container">
-    <button class="toggle-overlay-btn" @click="toggleOverlay">
-        <img :src="hamburger" alt="Menu" class="hamburger-icon" />
-    </button>
-
     <!-- render the home page description -->
     <div v-html="description"></div>
 
     <!-- Render the carousel -->
-    <div v-if="issues.length">
+    <div v-if="issues.length" class="carousel-container">
+      <button class="toggle-overlay-btn" @click="toggleOverlay">
+        <img :src="hamburger" alt="Menu" class="hamburger-icon" />
+      </button>
       <h2>Issues</h2>
       <Carousel v-bind="carouselConfig">
         <Slide v-for="issue in issues" :key="issue.id">
           <div class="carousel__item">
             <div class="image-container">
-              <img 
-                v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
-                :src="issue.cover_image.meta.download_url"
-                alt="Issue Cover"
-              />
+              <img v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
+                :src="issue.cover_image.meta.download_url" alt="Issue Cover" />
               <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
                 <button class="view-button">
                   <span>View Issue</span>
@@ -101,11 +97,19 @@ onMounted(async () => {
   margin: 0 10%;
 }
 
+.carousel-container {
+  background-color: #e5e5e5;
+  position: relative;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+}
+
 .toggle-overlay-btn {
-  background-color: transparent;
   position: absolute;
-  top: 200px;
-  right: 150px;
+  top: 20px;
+  right: 20px;
+  background-color: transparent;
   border: none;
   cursor: pointer;
   z-index: 999;
@@ -117,7 +121,7 @@ onMounted(async () => {
 }
 
 img {
-  width: 80%; 
+  width: 80%;
   height: auto;
   border-radius: 5px;
   transition: transform 0.3s ease-in-out;
@@ -169,5 +173,9 @@ img {
   --vc-pgn-active-color: rgba(255, 255, 255, 1);
   --vc-nav-background: rgba(255, 255, 255, 0.7);
   --vc-nav-border-radius: 100%;
+}
+
+::v-deep(.carousel__pagination-button--active) { /*override the active button color for carousel*/
+  background-color: #b02b27 !important;
 }
 </style>
