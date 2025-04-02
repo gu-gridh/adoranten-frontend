@@ -12,7 +12,7 @@ const showOverlay = ref(false)
 
 const carouselConfig = {
   itemsToShow: 2.5,
-  wrapAround: true
+  wrapAround: true,
 }
 
 const toggleOverlay = () => {
@@ -90,6 +90,8 @@ onMounted(async () => {
       <p>No issues found</p>
     </div>
 
+    <div v-html="description"></div>
+
     <Overlay :show="showOverlay" :issues="issues" @close="toggleOverlay" />
   </div>
 </template>
@@ -101,14 +103,15 @@ onMounted(async () => {
 
 .toggle-overlay-btn {
   position: absolute;
-  top: 100px;
-  right: 80px;
+  top: 300px;
+  right: 150px;
   background: rgb(239, 239, 239);
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   padding: 0;
+  z-index: 999;
 }
 
 .carousel__item {
@@ -117,7 +120,8 @@ onMounted(async () => {
 }
 
 img {
-  max-width: 50%;
+  width: 80%; 
+  height: auto;
   border-radius: 5px;
   transition: transform 0.3s ease-in-out;
 }
@@ -156,5 +160,17 @@ img {
 
 .image-container:hover .view-button {
   opacity: 1;
+}
+
+.carousel__slide {
+  width: 30% !important;
+  margin: 0 5%; /* top no margin, left and right 5% */
+}
+
+.carousel {
+  --vc-pgn-background-color: rgba(255, 255, 255, 0.7);
+  --vc-pgn-active-color: rgba(255, 255, 255, 1);
+  --vc-nav-background: rgba(255, 255, 255, 0.7);
+  --vc-nav-border-radius: 100%;
 }
 </style>

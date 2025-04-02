@@ -29,14 +29,19 @@ body {
   min-height: 100vh;
 }
 
+html, body {  
+  /* hide scrllbars */
+  overflow-x: hidden;
+  overflow-y: auto; 
+
+  /* For Firefox, IE, Edge... */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-}
-
-#app {
-  margin: 0 auto;
-  text-align: center;
 }
 
 @media (prefers-color-scheme: light) {
