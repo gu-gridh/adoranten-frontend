@@ -154,7 +154,7 @@ watch(searchTerm, async (newValue) => {
 
 <template>
   <div>
-    <p>{{ description }}</p>
+    <p v-html="description"></p>
 
     <input v-model="searchTerm" type="text" placeholder="Enter search term..." />
 

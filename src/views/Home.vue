@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import 'vue3-carousel/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import linkArrow from '/src/assets/link-arrow.png'
-import hamburger from '/src/assets/hamburger.svg'
+import hamburger from '/src/assets/menu.png'
 import Overlay from '/src/views/Overlay.vue'
 
 const description = ref('Loading...')
@@ -102,15 +102,12 @@ onMounted(async () => {
 }
 
 .toggle-overlay-btn {
+  background-color: transparent;
   position: absolute;
-  top: 300px;
+  top: 200px;
   right: 150px;
-  background: rgb(239, 239, 239);
-  color: white;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
-  padding: 0;
   z-index: 999;
 }
 

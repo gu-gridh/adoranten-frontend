@@ -2,7 +2,7 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import linkArrow from '/src/assets/link-arrow.png'
-import downloadButton from '/src/assets/downloadButton.png'
+import downloadButton from '/src/assets/download.png'
 
 // access the current route
 const route = useRoute()
@@ -71,7 +71,7 @@ onMounted(async () => {
                 :alt="article.article_title"
               />
               <button class="view-button">
-                <span>Download citation</span>
+                <span>Download Citation</span>
                 <img :src="downloadButton" alt="Arrow Icon" class="download-icon" />
               </button>
             </div>
