@@ -61,42 +61,39 @@ onMounted(async () => {
     description.value = 'error loading search page content'
   }
 
-
   if (!useLazyLoading.value) {
-
     //fetch all issues
     try {
-      const response = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage')
-      if (!response.ok) {
-        throw new Error('network response was not ok')
+      const [issuesResponse, articlesResponse] = await Promise.all([
+        fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage'),
+        fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.ArticlePage')
+      ]);
+
+      if (!issuesResponse.ok || !articlesResponse.ok) {
+        throw new Error('network response was not ok');
       }
-      const data = await response.json()
 
-      //store in all articles
-      allArticles.value = data.items || []
+      const [issuesData, articlesData] = await Promise.all([
+        issuesResponse.json(),
+        articlesResponse.json()
+      ]);
 
-      // fetch all articles
-      const articlesResponse = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.ArticlePage')
-      if (!articlesResponse.ok) {
-        throw new Error('network response was not ok')
-      }
-      const articlesData = await articlesResponse.json()
+      //store issues in allArticles
+      allArticles.value = issuesData.items || [];
 
-      // process articles to match the structure needed for display
-      const processedArticles = processArticles(articlesData, allArticles.value)
+      //process articles
+      const processedArticles = processArticles(articlesData, allArticles.value);
 
-      // add articles to all articles
-      allArticles.value = [...allArticles.value, ...processedArticles]
+      //combine issues and processed articles
+      allArticles.value = [...allArticles.value, ...processedArticles];
 
-      //results.value = allArticles.value
-
-      const end = performance.now()
-      console.log(`Eager load initial rendering took ${(end - start).toFixed(2)} ms`)
-
+      const end = performance.now();
+      console.log(`Eager load initial rendering took ${(end - start).toFixed(2)} ms`);
     } catch (error) {
-      console.error('Error fetching IssuePages:', error)
+      console.error('error fetching issues or articles:', error);
     }
-  } else {
+  }
+  else {
     const end = performance.now()
     console.log(`Lazy load initial rendering took ${(end - start).toFixed(2)} ms`)
   }
