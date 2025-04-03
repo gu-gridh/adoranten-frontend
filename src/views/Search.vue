@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import articleIcon from '/src/assets/article.png'
+import issueIcon from '/src/assets/issue.png'
 
 const description = ref('Loading...')
 const searchTerm = ref('')
@@ -150,39 +152,80 @@ watch(searchTerm, async (newValue) => {
 </script>
 
 <template>
-  <div>
-    <p v-html="description"></p>
+  <p v-html="description"></p>
 
+  <div class="search-container">
     <input v-model="searchTerm" type="text" placeholder="Search for issues and articles..." class="search-input" />
 
-    <div v-if="results.length">
-      <div v-for="item in results" :key="item.id">
+    <div v-if="results.length" class="search-results">
+      <div v-for="item in results" :key="item.id" class="search-item">
+        <img v-if="!item.isArticle" :src="issueIcon" alt="Issue Icon" class="search-icon" />
+        <img v-else :src="articleIcon" alt="Article Icon" class="search-icon" />
+
         <!-- For normal issues -->
         <router-link v-if="!item.isArticle" :to="{ name: 'Issue', params: { id: item.id } }">
           {{ item.title }}
         </router-link>
 
         <!-- For articles -->
-        <router-link v-else-if="item.issueId"
-          :to="{ name: 'Issue', params: { id: item.issueId }, hash: '#article-' + item.id }">
+        <router-link v-else-if="item.issueId" :to="{
+          name: 'Issue',
+          params: { id: item.issueId },
+          hash: '#article-' + item.id
+        }">
           {{ item.title }} (Article)
         </router-link>
       </div>
-    </div>
-
-    <div v-else>
-      <p>No results found.</p>
     </div>
   </div>
 </template>
 
 <style scoped>
 .search-input {
-  width: 50%;
+  width: 100%;
   padding: 8px;
   margin-bottom: 0;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1.4em;
+  box-sizing: border-box;
+}
+
+.search-container {
+  position: relative;
+  width: 50%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 999;
+  margin-top: 2px;
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+}
+
+.search-icon {
+  width: 24px;
+  height: auto;
+  margin-right: 8px;
+}
+
+.search-item:hover {
+  background-color: #e2e2e2;
 }
 </style>
