@@ -99,7 +99,7 @@ resize: none;
 button {
 width: 100%;
 padding: 10px;
-background: #030303;
+background: var(--theme-1);
 color: #fff;
 border: none;
 border-radius: 3px;

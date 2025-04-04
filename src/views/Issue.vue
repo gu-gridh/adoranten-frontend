@@ -153,7 +153,7 @@ ul {
 }
 
 .article-box {
-  background-color: #3C3C3C;
+  background-color: var(--theme-1);
   border-radius: 8px;
   padding: 10px;
   display: flex;
@@ -204,7 +204,7 @@ ul {
 }
 
 .citation-button {
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--theme-2);
   color: white;
   border: none;
   font-size: 14px;

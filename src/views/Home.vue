@@ -102,7 +102,7 @@ h2, h3 {
 }
 
 .carousel-container {
-  background-color: #3C3C3C;
+  background-color: var(--theme-1);
   position: relative;
   padding: 20px;
   margin-top: 20px;
@@ -140,7 +140,7 @@ img {
   bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--theme-2);
   color: white;
   border: none;
   padding: 8px 12px;
