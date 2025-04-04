@@ -7,6 +7,7 @@ const description = ref('Loading...')
 const searchTerm = ref('')
 const allArticles = ref([]) //holds the full list of articles fetched on mount
 const results = ref([]) //filtered results that we display
+const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type='
 const useLazyLoading = ref(false) // toggle between eager and lazy loading implementations
 
 // function for processing articles to match the structure needed for display
@@ -50,7 +51,7 @@ onMounted(async () => {
   const start = performance.now()
 
   try {
-    const responseSearch = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.SearchPage&fields=description')
+    const responseSearch = await fetch(`${baseURL}home.SearchPage&fields=description`)
     const dataSearch = await responseSearch.json()
 
     if (dataSearch.items && dataSearch.items.length > 0) {
@@ -67,8 +68,8 @@ onMounted(async () => {
     //fetch all issues
     try {
       const [issuesResponse, articlesResponse] = await Promise.all([
-        fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage'),
-        fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.ArticlePage')
+        fetch(`${baseURL}journal.IssuePage`),
+        fetch(`${baseURL}journal.ArticlePage`)
       ]);
 
       if (!issuesResponse.ok || !articlesResponse.ok) {
@@ -115,11 +116,13 @@ watch(searchTerm, async (newValue) => {
 
     try {
       // Fetch issues
-      const issuesResponse = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&search=${encodeURIComponent(newValue)}`)
+      const issuesResponse = await fetch(`${baseURL}journal.IssuePage&search=${encodeURIComponent(newValue)}`)
+      console.log(issuesResponse);
+      
       const issuesData = await issuesResponse.json()
 
       // Fetch articles
-      const articlesResponse = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.ArticlePage&search=${encodeURIComponent(newValue)}`)
+      const articlesResponse = await fetch(`${baseURL}journal.ArticlePage&search=${encodeURIComponent(newValue)}`)
       const articlesData = await articlesResponse.json()
 
       // process articles to match the structure needed for display

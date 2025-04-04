@@ -7,6 +7,8 @@ import downloadButton from '/src/assets/download.png'
 // access the current route
 const route = useRoute()
 
+const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.'
+
 const articles = ref([])
 const issue = ref([])
 const issueId = route.params.id
@@ -15,7 +17,7 @@ onMounted(async () => {
   //fetch issue article data
   try {
     // get the issue ID from the URL params
-    const responseArticles = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.ArticlePage&child_of=${issueId}&fields=*`)
+    const responseArticles = await fetch(`${baseURL}ArticlePage&child_of=${issueId}&fields=*`)
     const data = await responseArticles.json()
     if (data.items && data.items.length > 0) {
         articles.value = data.items
@@ -29,7 +31,7 @@ onMounted(async () => {
   //fetch issue full pdf
   try {
     // get the issue ID from the URL params
-    const responseIssue = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&id=${issueId}&fields=*`)
+    const responseIssue = await fetch(`${baseURL}IssuePage&id=${issueId}&fields=*`)
     const data = await responseIssue.json()
     if (data.items && data.items.length > 0) {
         issue.value = data.items[0]
