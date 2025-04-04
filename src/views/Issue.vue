@@ -70,7 +70,7 @@ onMounted(async () => {
             <div v-if="article.image?.meta?.download_url" class="image-container">
               <img
                 :src="article.image.meta.download_url"
-                :alt="article.article_title"
+                :alt="article.title"
               />
               <button class="view-button">
                 <span>Download Citation</span>
@@ -79,7 +79,7 @@ onMounted(async () => {
             </div>
 
             <div class="content">
-              <h3>{{ article.article_title }}</h3>
+              <h3>{{ article.title }}</h3>
               <div
                 v-html="article.article_description"
                 class="article-description"
