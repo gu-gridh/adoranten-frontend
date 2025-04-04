@@ -68,8 +68,8 @@ onMounted(async () => {
     //fetch all issues
     try {
       const [issuesResponse, articlesResponse] = await Promise.all([
-        fetch(`${baseURL}journal.IssuePage`),
-        fetch(`${baseURL}journal.ArticlePage`)
+        fetch(`${baseURL}journal.IssuePage&limit=200`),
+        fetch(`${baseURL}journal.ArticlePage&limit=200`)
       ]);
 
       if (!issuesResponse.ok || !articlesResponse.ok) {
