@@ -13,6 +13,24 @@ const articles = ref([])
 const issue = ref([])
 const issueId = route.params.id
 
+// function downloadCitation(articleTitle, format) {
+//   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
+
+//   const fileName = `${sanitizedTitle}.${format}`
+
+//   const citationText = `citation for "${articleTitle}" in a .${format} file.`
+
+//   //blob is a file-like object ofraw data
+//   const blob = new Blob([citationText], { type: 'text/plain' })
+
+//   //create a temporary link to trigger the download because blobs can't be downloaded directly
+//   const link = document.createElement('a')
+//   link.href = URL.createObjectURL(blob)
+//   link.download = fileName
+//   link.click()
+//   URL.revokeObjectURL(link.href)
+// }
+
 onMounted(async () => {
   //fetch issue article data
   try {
@@ -20,9 +38,9 @@ onMounted(async () => {
     const responseArticles = await fetch(`${baseURL}ArticlePage&child_of=${issueId}&fields=*`)
     const data = await responseArticles.json()
     if (data.items && data.items.length > 0) {
-        articles.value = data.items
+      articles.value = data.items
     } else {
-          articles.value = []
+      articles.value = []
     }
   } catch (error) {
     console.error('error fetching articles:', error)
@@ -34,9 +52,9 @@ onMounted(async () => {
     const responseIssue = await fetch(`${baseURL}IssuePage&id=${issueId}&fields=*`)
     const data = await responseIssue.json()
     if (data.items && data.items.length > 0) {
-        issue.value = data.items[0]
+      issue.value = data.items[0]
     } else {
-          issue.value = []
+      issue.value = []
     }
   } catch (error) {
     console.error('error fetching issue full pdf:', error)
@@ -55,7 +73,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <h2>Articles</h2>
+    <h2>{{ issue.title }}</h2>
     <h3>
       <a v-if="issue.pdf_file" :href="issue.pdf_file" target="_blank">
         Read full {{ issue.title }} PDF
@@ -65,17 +83,18 @@ onMounted(async () => {
     <div class="container">
       <p v-if="!articles.length">No articles found.</p>
       <ul v-else>
-        <li v-for="article in articles" :key="article.id" :id="'article-' + article.id">
+        <li 
+          v-for="article in articles" 
+          :key="article.id" 
+          :id="'article-' + article.id"
+          class="article-list-item"
+        >
           <div class="article-box">
             <div v-if="article.image?.meta?.download_url" class="image-container">
               <img
                 :src="article.image.meta.download_url"
                 :alt="article.title"
               />
-              <button class="view-button">
-                <span>Download Citation</span>
-                <img :src="downloadButton" alt="Arrow Icon" class="download-icon" />
-              </button>
             </div>
 
             <div class="content">
@@ -85,15 +104,26 @@ onMounted(async () => {
                 class="article-description"
               ></div>
             </div>
-            <a
-              v-if="article.pdf_file"
-              :href="article.pdf_file"
-              target="_blank"
-              class="pdf-link"
-            >
-              <span>Read PDF</span>
-              <img :src="linkArrow" alt="Right Arrow Icon" class="arrow-icon" />
-            </a>
+
+            <div class="button-group">
+              <button class="citation-button" @click="downloadCitation(article.title, 'docx')">
+                <span>Download Citation (APA)</span>
+                <img :src="downloadButton" alt="Download Icon" class="download-icon" />
+              </button>
+              <button class="citation-button" @click="downloadCitation(article.title, 'txt')">
+                <span>Download Citation (MLA)</span>
+                <img :src="downloadButton" alt="Download Icon" class="download-icon" />
+              </button>
+              <a
+                v-if="article.pdf_file"
+                :href="article.pdf_file"
+                target="_blank"
+                class="pdf-link"
+              >
+                <span>Read PDF</span>
+                <img :src="linkArrow" alt="Right Arrow Icon" class="arrow-icon" />
+              </a>
+            </div>
           </div>
         </li>
       </ul>
@@ -103,78 +133,77 @@ onMounted(async () => {
 
 <style scoped>
 .container {
-  flex-direction: column;
   padding: 20px;
 }
 
 ul {
   list-style-type: none;
   padding: 0;
-}
-
-li {
-  margin-bottom: 20px;
+  margin: 0;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 20px;
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  align-items: flex-start;
-}
+.article-list-item {
+  width: calc(33.333% - 20px);
+  box-sizing: border-box;
+  margin-bottom: 20px;
 
-.content > * {
-  margin: 0 0 10px 0;
-}
-
-img {
-  width: 300px;
-  height: auto;
-  object-fit: cover;
-  transition: transform 0.3s ease-in-out;
-}
-
-.article-description {
-  line-height: 1.6;
-  max-width: 800px;
-  font-size: 1rem;
-  color: #333;
-  text-align: left;
-  width: 100%;
-  flex: 1;
 }
 
 .article-box {
-  background-color: #f5f5f5;
+  background-color: #3C3C3C;
   border-radius: 8px;
-  padding: 15px;
-  position: relative;
-  width: 90%;
+  padding: 10px;
   display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  margin: 0 auto;
+  flex-direction: column;
+  height: 100%;
 }
 
 .image-container {
-  position: relative;
+  width: 100%;
+  height: 200px; 
   overflow: hidden;
   border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease-in-out;
 }
 
 .image-container:hover img {
   transform: scale(1.05);
 }
 
-.view-button {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  color: white;
+}
+
+.article-description {
+  line-height: 1.6;
+  font-size: 1rem;
+  color: #333;
+  text-align: left;
+  color: white;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto; 
+}
+
+.citation-button {
   background: rgba(0, 0, 0, 0.7);
   color: white;
   border: none;
@@ -182,20 +211,10 @@ img {
   padding: 6px 10px;
   border-radius: 5px;
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.image-container:hover .view-button {
-  opacity: 1;
-}
-
-.arrow-icon {
-  width: 16px;
-  height: 16px;
+  text-transform: none;
 }
 
 .download-icon {
@@ -204,12 +223,6 @@ img {
 }
 
 .pdf-link {
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   background: #000;
   color: #fff;
   padding: 6px 10px;
@@ -217,6 +230,25 @@ img {
   text-decoration: none;
   font-weight: bold;
   font-size: 14px;
-  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arrow-icon {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 1024px) {
+  .article-list-item {
+    width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 600px) {
+  .article-list-item {
+    width: 100%;
+  }
 }
 </style>

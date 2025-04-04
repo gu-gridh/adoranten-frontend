@@ -93,12 +93,16 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+h2, h3 {
+  color: white;
+}
+
 #home-container {
   margin: 0 10%;
 }
 
 .carousel-container {
-  background-color: #e5e5e5;
+  background-color: #3C3C3C;
   position: relative;
   padding: 20px;
   margin-top: 20px;
