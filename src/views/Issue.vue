@@ -223,7 +223,7 @@ ul {
 }
 
 .pdf-link {
-  background: #000;
+  background: var(--theme-2);
   color: #fff;
   padding: 6px 10px;
   border-radius: 5px;

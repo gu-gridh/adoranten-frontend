@@ -84,7 +84,7 @@ const navigateTo = (path) => {
 }
 
 .header-tabs nav ul li:hover {
-  color: #666;
+  color: var(--theme-3);
 }
 
 .header-tabs nav ul li.active {
@@ -97,6 +97,6 @@ const navigateTo = (path) => {
   font-family: 'Teko', sans-serif;
   margin-left: 20px;
   font-size: 50px;
-  color: #b02b27;
+  color: var(--theme-4);
 }
 </style>

@@ -20,7 +20,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed&display=swap');
 
 #footer {
-  background-color: #222;
+  background-color: var(--theme-6);
   color: #fff;
   padding: 15px;
   width: 100%;

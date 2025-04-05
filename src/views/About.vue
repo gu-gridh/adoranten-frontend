@@ -85,7 +85,7 @@ margin-bottom: 10px;
 input, textarea {
 width: 100%;
 padding: 6px;
-border: 1px solid #ccc;
+border: 1px solid var(--theme-5);
 border-radius: 3px;
 box-sizing: border-box;
 font-family: Arial, sans-serif;
@@ -108,7 +108,7 @@ font-family: system-ui, Helvetica, Arial, sans-serif;;
 }
 
 button:hover {
-background: #8a8a8a;
+background: var(--theme-3);
 }
 </style>
 

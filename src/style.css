@@ -14,16 +14,18 @@
 
   --theme-1: #3C3C3C;
   /* This is the background color */
-  /* --theme-2: rgb(250, 150, 150); */
-  /* This is for lighter text on dark backgrounds */
+  --theme-6: #222;
+  /* This is a darker background color  */
   --theme-2: rgba(0, 0, 0, 0.7);
   /* This is for darker button background */
-  --theme-3: rgb(180, 100, 100);
-  /* This is the main accent colour */
-  --theme-4: rgb(160, 80, 80);
-  /* This is for accent hover */
-  --theme-5: rgb(140, 60, 60);
-  /* This is for accent lines */
+  --theme-3: #666;
+  /* This is for button hover */
+  --theme-4: #b02b27;
+  /* This is site title color  */
+  --theme-7: #ccc;
+  /* This is a light border color  */
+  --theme-5: #ddd;
+  /* This is an even light border color  */
 }
 
 a {

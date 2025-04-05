@@ -188,7 +188,7 @@ watch(searchTerm, async (newValue) => {
   width: 100%;
   padding: 8px;
   margin-bottom: 0;
-  border: 1px solid #ddd;
+  border: 1px solid var(--theme-5);
   border-radius: 4px;
   font-size: 1.4em;
   box-sizing: border-box;
@@ -207,7 +207,7 @@ watch(searchTerm, async (newValue) => {
   left: 0;
   right: 0;
   box-sizing: border-box;
-  border: 1px solid #ddd;
+  border: 1px solid var(--theme-5);
   border-radius: 4px;
   max-height: 400px;
   overflow-y: auto;
@@ -219,7 +219,7 @@ watch(searchTerm, async (newValue) => {
   display: flex;
   align-items: center;
   padding: 8px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--theme-7);
 }
 
 .search-icon {
