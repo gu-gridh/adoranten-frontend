@@ -26,6 +26,10 @@
   /* This is a light border color  */
   --theme-5: #ddd;
   /* This is an even light border color  */
+
+  
+  --theme-8: #f0f0f0;
+  /* This is the bright footer font color */
 }
 
 a {

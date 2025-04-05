@@ -21,7 +21,7 @@
 
 #footer {
   background-color: var(--theme-6);
-  color: #fff;
+  color: var(--theme-8);
   padding: 15px;
   width: 100%;
   font-family: Barlow Condensed,sans-serif;
@@ -40,7 +40,7 @@
 }
 
 a {
-  color: #fff;
+  color: var(--theme-8);
   text-decoration: none;
   margin-right: 25px;
 }
