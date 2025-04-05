@@ -64,8 +64,8 @@ onMounted(async () => {
         <Slide v-for="issue in issues" :key="issue.id">
           <div class="carousel__item">
             <div class="image-container">
-              <img v-if="issue.cover_image && issue.cover_image.meta && issue.cover_image.meta.download_url"
-                :src="issue.cover_image.meta.download_url" alt="Issue Cover" />
+              <img v-if="issue.image && issue.image.meta && issue.image.meta.download_url"
+                :src="issue.image.meta.download_url" alt="Issue Cover" />
               <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
                 <button class="view-button">
                   <span>View Issue</span>
