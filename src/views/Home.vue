@@ -5,11 +5,13 @@ import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import linkArrow from '/src/assets/link-arrow.png'
 import hamburger from '/src/assets/menu.png'
 import Overlay from '/src/views/Overlay.vue'
+import { useRouter } from 'vue-router';
 
 const description = ref('Loading...')
 const issues = ref([])
 const showOverlay = ref(false)
 const articles = ref([])
+const router = useRouter();
 
 const carouselConfig = {
   itemsToShow: 2.5,
@@ -20,41 +22,83 @@ const toggleOverlay = () => {
   showOverlay.value = !showOverlay.value
 }
 
+const navigateToArticle = (article) => {
+  if (article.issueId) {
+    router.push({ 
+      name: 'Issue', 
+      params: { id: article.issueId },
+      hash: `#article-${article.id}`
+    });
+  }
+}
+
 onMounted(async () => {
-  //fetch home page data
   try {
-    const responseHome = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.HomePage&fields=*')
-    const dataHome = await responseHome.json()
+    // Fetch both home page and issues data
+    const [responseHome, responseIssues] = await Promise.all([
+      fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.HomePage&fields=*'),
+      fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&fields=*')
+    ]);
+    
+    const dataHome = await responseHome.json();
+    const dataIssues = await responseIssues.json();
+    
+    // Set description and issues data
     if (dataHome.items && dataHome.items.length > 0) {
-  description.value = dataHome.items[0].description
-  
-  // Get articles directly
-  if (dataHome.items[0].article_highlights) {
-    const articleList = dataHome.items[0].article_highlights[1];
-    if (articleList && articleList.type === 'article_list' && articleList.value) {
-      articles.value = articleList.value;
+      description.value = dataHome.items[0].description;
     }
-  }
-
-    } else {
-      description.value = 'No home page content found'
-    }
-  } catch (error) {
-    console.error('error fetching home page data:', error)
-    description.value = 'error loading home page content'
-  }
-
-  //fetch issues data
-  try {
-    const responseIssues = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&fields=*')
-    const dataIssues = await responseIssues.json()
+    
     if (dataIssues.items && dataIssues.items.length > 0) {
-      issues.value = dataIssues.items
-    } else {
-      issues.value = []
+      issues.value = dataIssues.items;
+    }
+    
+    // Get articles
+    if (dataHome.items && dataHome.items.length > 0 && dataHome.items[0].article_highlights) {
+      const articleList = dataHome.items[0].article_highlights[1];
+      if (articleList && articleList.type === 'article_list' && articleList.value) {
+        // Get basic article data
+        const basicArticles = articleList.value;
+        
+        // Fetch detailed article data to get URLs for linking
+        const articlePromises = basicArticles.map(article => 
+          fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/${article.id}/`)
+            .then(res => res.json())
+        );
+        
+        // Process articles with the detailed data
+        Promise.all(articlePromises).then(articleDetails => {
+          articles.value = basicArticles.map((article, index) => {
+            const meta = articleDetails[index].meta;
+            const articleUrl = meta?.html_url || '';
+            let issueId = null;
+            
+            if (articleUrl) {
+              const urlParts = articleUrl.split('/');
+              const publicationsIndex = urlParts.indexOf('publications');
+              
+              if (publicationsIndex !== -1 && urlParts.length > publicationsIndex + 1) {
+                const issueSlug = urlParts[publicationsIndex + 1];
+                const matchingIssue = issues.value.find(
+                  item => item.meta && item.meta.slug === issueSlug
+                );
+                
+                if (matchingIssue) {
+                  issueId = matchingIssue.id;
+                }
+              }
+            }
+            
+            return {
+              ...article,
+              issueId
+            };
+          });
+        });
+      }
     }
   } catch (error) {
-    console.error('error fetching issues data:', error)
+    console.error('Error fetching data:', error);
+    description.value = 'error loading content';
   }
 })
 </script>
@@ -96,16 +140,19 @@ onMounted(async () => {
       <p>No issues found</p>
     </div>
 
-        <!-- Articles Display -->
-        <div v-if="articles.length" class="articles-container">
+      <!-- Articles Display -->
+      <div v-if="articles.length" class="articles-container">
       <h2>Selected Articles</h2>
       <div class="articles-grid">
-        <div v-for="article in articles" :key="article.id" class="article-card">
-          <img v-if="article.image && article.image.file" 
-            :src="article.image.file" 
-            :alt="article.title"
-            class="article-image" />
-          <h3 class="article-title">{{ article.title }}</h3>
+        <div v-for="article in articles" :key="article.id" 
+            class="article-card" 
+            @click="navigateToArticle(article)"
+            :style="article.issueId ? 'cursor: pointer' : ''">
+            <img v-if="article.image && article.image.file" 
+              :src="article.image.file" 
+              :alt="article.title"
+              class="article-image" />
+            <h3 class="article-title">{{ article.title }}</h3>
         </div>
       </div>
     </div>
@@ -121,19 +168,25 @@ onMounted(async () => {
   margin-top: 20px;
   margin-bottom: 20px;
   border-radius: 8px;
+  text-align: left;
 }
 
 .articles-grid {
   display: flex;
-  gap: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
   margin-top: 20px;
-  overflow-x: auto;
   justify-content: space-between;
 }
 
 .article-card {
   min-width: 200px;
   text-align: left;
+}
+
+.article-card:hover {
+  transform: scale(1.03);
+  transition: transform 0.3s ease;
 }
 
 .article-image {
