@@ -9,6 +9,7 @@ import Overlay from '/src/views/Overlay.vue'
 const description = ref('Loading...')
 const issues = ref([])
 const showOverlay = ref(false)
+const articles = ref([])
 
 const carouselConfig = {
   itemsToShow: 2.5,
@@ -22,10 +23,19 @@ const toggleOverlay = () => {
 onMounted(async () => {
   //fetch home page data
   try {
-    const responseHome = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.HomePage&fields=description')
+    const responseHome = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.HomePage&fields=*')
     const dataHome = await responseHome.json()
     if (dataHome.items && dataHome.items.length > 0) {
-      description.value = dataHome.items[0].description
+  description.value = dataHome.items[0].description
+  
+  // Get articles directly
+  if (dataHome.items[0].article_highlights) {
+    const articleList = dataHome.items[0].article_highlights[1];
+    if (articleList && articleList.type === 'article_list' && articleList.value) {
+      articles.value = articleList.value;
+    }
+  }
+
     } else {
       description.value = 'No home page content found'
     }
@@ -86,13 +96,58 @@ onMounted(async () => {
       <p>No issues found</p>
     </div>
 
-    <div v-html="description"></div>
+        <!-- Articles Display -->
+        <div v-if="articles.length" class="articles-container">
+      <h2>Selected Articles</h2>
+      <div class="articles-grid">
+        <div v-for="article in articles" :key="article.id" class="article-card">
+          <img v-if="article.image && article.image.file" 
+            :src="article.image.file" 
+            :alt="article.title"
+            class="article-image" />
+          <h3 class="article-title">{{ article.title }}</h3>
+        </div>
+      </div>
+    </div>
 
     <Overlay :show="showOverlay" :issues="issues" @close="toggleOverlay" />
   </div>
 </template>
 
 <style scoped>
+.articles-container {
+  background-color: var(--theme-1);
+  padding: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.articles-grid {
+  display: flex;
+  gap: 40px;
+  margin-top: 20px;
+  overflow-x: auto;
+  justify-content: space-between;
+}
+
+.article-card {
+  min-width: 200px;
+  text-align: left;
+}
+
+.article-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.article-title {
+  margin-top: 10px;
+  font-size: 1rem;
+}
+
 h2, h3 {
   color: white;
 }
