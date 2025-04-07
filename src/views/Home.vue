@@ -163,7 +163,6 @@ onMounted(async () => {
 
 <style scoped>
 .articles-container {
-  background-color: var(--theme-1);
   padding: 20px;
   margin-top: 20px;
   margin-bottom: 20px;
@@ -171,12 +170,23 @@ onMounted(async () => {
   text-align: left;
 }
 
+.articles-container h2 {
+  text-align: center;
+}
+
+.articles-container h2,
+.articles-container .article-title {
+  color: var(--theme-2);
+}
+
 .articles-grid {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  gap: 40px;
   margin-top: 20px;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  overflow: hidden;
+  width: 100%;
+  justify-content: space-evenly;
 }
 
 .article-card {
@@ -184,19 +194,21 @@ onMounted(async () => {
   text-align: left;
 }
 
-.article-card:hover {
+.article-card:hover .article-image {
   transform: scale(1.03);
-  transition: transform 0.3s ease;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.12);
 }
 
 .article-image {
-  width: 300px;
-  height: 300px;
+  width: 100%;
+  max-height: 200px;
   object-fit: cover;
   border-radius: 5px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .article-title {
+  width: 100%;
   margin-top: 10px;
   font-size: 1rem;
 }
@@ -287,7 +299,7 @@ img {
   --vc-nav-border-radius: 100%;
 }
 
-::v-deep(.carousel__pagination-button--active) { /*override the active button color for carousel*/
+::v-deep(.carousel__pagination-button--active) {  /*override the active button color for carousel*/
   background-color: #b02b27 !important;
 }
 </style>
