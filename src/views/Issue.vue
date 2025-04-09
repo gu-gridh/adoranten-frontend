@@ -83,18 +83,10 @@ onMounted(async () => {
     <div class="container">
       <p v-if="!articles.length">No articles found.</p>
       <ul v-else>
-        <li 
-          v-for="article in articles" 
-          :key="article.id" 
-          :id="'article-' + article.id"
-          class="article-list-item"
-        >
+        <li v-for="article in articles" :key="article.id" :id="'article-' + article.id" class="article-list-item">
           <div class="article-box">
             <div v-if="article.image?.meta?.download_url" class="image-container">
-              <img
-                :src="article.image.meta.download_url"
-                :alt="article.title"
-              />
+              <img :src="article.image.meta.download_url" :alt="article.title" />
             </div>
 
             <div class="content">
@@ -105,11 +97,7 @@ onMounted(async () => {
                 <div class="download-dropdown">
                   <button class="download-main-button" @click.stop="toggleDownload(article.id)">
                     Download
-                    <img 
-                      :src="downloadButton" 
-                      alt="Toggle Download Options" 
-                      class="arrow-icon" 
-                    />
+                    <img :src="downloadButton" alt="Toggle Download Options" class="arrow-icon" />
                   </button>
 
                   <div v-if="expandedArticleId === article.id" class="download-submenu">
@@ -166,7 +154,7 @@ ul {
 
 .image-container {
   width: 100%;
-  height: 200px; 
+  height: 200px;
   overflow: hidden;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
