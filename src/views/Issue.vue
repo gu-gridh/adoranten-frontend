@@ -8,28 +8,28 @@ import downloadButton from '/src/assets/download.png'
 const route = useRoute()
 
 const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.'
-
+const expandedArticleId = ref(null)
 const articles = ref([])
 const issue = ref([])
 const issueId = route.params.id
 
-// function downloadCitation(articleTitle, format) {
-//   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
+function downloadCitation(articleTitle, format) {
+  const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
+  const fileName = `${sanitizedTitle}.${format}`
+  const citationText = `citation for "${articleTitle}" in a .${format} file.`
+  const blob = new Blob([citationText], { type: 'text/plain' })   //blob is a file-like object ofraw data
 
-//   const fileName = `${sanitizedTitle}.${format}`
+  //create a temporary link to trigger the download because blobs can't be downloaded directly
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(link.href)
+}
 
-//   const citationText = `citation for "${articleTitle}" in a .${format} file.`
-
-//   //blob is a file-like object ofraw data
-//   const blob = new Blob([citationText], { type: 'text/plain' })
-
-//   //create a temporary link to trigger the download because blobs can't be downloaded directly
-//   const link = document.createElement('a')
-//   link.href = URL.createObjectURL(blob)
-//   link.download = fileName
-//   link.click()
-//   URL.revokeObjectURL(link.href)
-// }
+function toggleDownload(articleId) {
+  expandedArticleId.value = expandedArticleId.value === articleId ? null : articleId
+}
 
 onMounted(async () => {
   //fetch issue article data
@@ -60,7 +60,7 @@ onMounted(async () => {
     console.error('error fetching issue full pdf:', error)
   }
 
-  // after data is loaded, scroll to hash if present
+  //after data is loaded, scroll to hash if present
   await nextTick()
   if (route.hash) {
     const element = document.querySelector(route.hash)
@@ -99,30 +99,34 @@ onMounted(async () => {
 
             <div class="content">
               <h3>{{ article.title }}</h3>
-              <div
-                v-html="article.article_description"
-                class="article-description"
-              ></div>
-            </div>
+              <div v-html="article.article_description" class="article-description"></div>
 
-            <div class="button-group">
-              <button class="citation-button" @click="downloadCitation(article.title, 'docx')">
-                <span>Download Citation (APA)</span>
-                <img :src="downloadButton" alt="Download Icon" class="download-icon" />
-              </button>
-              <button class="citation-button" @click="downloadCitation(article.title, 'txt')">
-                <span>Download Citation (MLA)</span>
-                <img :src="downloadButton" alt="Download Icon" class="download-icon" />
-              </button>
-              <a
-                v-if="article.pdf_file"
-                :href="article.pdf_file"
-                target="_blank"
-                class="pdf-link"
-              >
-                <span>Read PDF</span>
-                <img :src="linkArrow" alt="Right Arrow Icon" class="arrow-icon" />
-              </a>
+              <div class="button-group">
+                <div class="download-dropdown">
+                  <button class="download-main-button" @click.stop="toggleDownload(article.id)">
+                    Download
+                    <img 
+                      :src="downloadButton" 
+                      alt="Toggle Download Options" 
+                      class="arrow-icon" 
+                    />
+                  </button>
+
+                  <div v-if="expandedArticleId === article.id" class="download-submenu">
+                    <button class="format-option" @click="downloadCitation(article.title, 'bibtex')">
+                      (bibtex)
+                    </button>
+                    <button class="format-option" @click="downloadCitation(article.title, 'ris')">
+                      (ris)
+                    </button>
+                  </div>
+                </div>
+
+                <a v-if="article.pdf_file" :href="article.pdf_file" target="_blank" class="pdf-link">
+                  <span>Read PDF</span>
+                  <img :src="linkArrow" alt="Right Arrow Icon" class="arrow-icon" />
+                </a>
+              </div>
             </div>
           </div>
         </li>
@@ -149,24 +153,23 @@ ul {
   width: calc(33.333% - 20px);
   box-sizing: border-box;
   margin-bottom: 20px;
-
 }
 
 .article-box {
   background-color: var(--theme-1);
   border-radius: 8px;
-  padding: 10px;
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: visible;
 }
 
 .image-container {
   width: 100%;
   height: 200px; 
   overflow: hidden;
-  border-radius: 5px;
-  margin-bottom: 10px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .image-container img {
@@ -186,26 +189,33 @@ ul {
   flex-direction: column;
   margin-bottom: 10px;
   color: white;
+  padding: 5px 15px 15px 15px;
 }
 
 .article-description {
   line-height: 1.6;
   font-size: 1rem;
-  color: #333;
-  text-align: left;
   color: white;
+  text-align: left;
 }
 
 .button-group {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  margin-top: auto; 
+  margin-top: auto;
+  position: relative;
 }
 
-.citation-button {
-  background: var(--theme-2);
-  color: white;
+.download-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.download-main-button {
+  background-color: var(--theme-2);
+  color: #fff;
   border: none;
   font-size: 14px;
   padding: 6px 10px;
@@ -214,12 +224,45 @@ ul {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  text-transform: none;
 }
 
 .download-icon {
   width: 20px;
   height: 20px;
+}
+
+.arrow-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.download-submenu {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-left: 8px;
+  background-color: var(--theme-2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  z-index: 999;
+}
+
+.format-option {
+  background: none;
+  border: none;
+  color: #fff;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.format-option:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .pdf-link {
@@ -233,11 +276,6 @@ ul {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.arrow-icon {
-  width: 16px;
-  height: 16px;
 }
 
 @media (max-width: 1024px) {
