@@ -2,7 +2,8 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import linkArrow from '/src/assets/link-arrow.png'
-import downloadButton from '/src/assets/download.png'
+// import downloadButton from '/src/assets/download.png'
+import rightArrow from '/src/assets/right-arrow.png'
 
 // access the current route
 const route = useRoute()
@@ -96,8 +97,8 @@ onMounted(async () => {
               <div class="button-group">
                 <div class="download-dropdown">
                   <button class="download-main-button" @click.stop="toggleDownload(article.id)">
-                    Download
-                    <img :src="downloadButton" alt="Toggle Download Options" class="arrow-icon" />
+                    <span>Download Citation</span>
+                    <img :src="rightArrow" alt="Toggle Download Options" class="arrow-icon" />
                   </button>
 
                   <div v-if="expandedArticleId === article.id" class="download-submenu">
@@ -233,9 +234,10 @@ ul {
   background-color: var(--theme-2);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   z-index: 999;
+  padding: 3.5px;
 }
 
 .format-option {
@@ -243,10 +245,10 @@ ul {
   border: none;
   color: #fff;
   text-align: left;
-  padding: 8px 12px;
+  padding: 6px 10px;
   font-size: 14px;
   cursor: pointer;
-  display: inline-block;
+  white-space: nowrap;
 }
 
 .format-option:hover {
