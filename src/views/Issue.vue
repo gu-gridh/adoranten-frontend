@@ -3,6 +3,7 @@ import { ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import linkArrow from '/src/assets/link-arrow.png'
 import rightArrow from '/src/assets/right-arrow.png'
+import backButton from '/src/assets/back-button.svg'
 // import downloadButton from '/src/assets/download.png'
 
 // access the current route
@@ -27,6 +28,10 @@ function downloadCitation(articleTitle, format) {
   link.download = fileName
   link.click()
   URL.revokeObjectURL(link.href)
+}
+
+function goBack() { //back one step in history
+  history.back()
 }
 
 function toggleDownload(articleId) {
@@ -96,8 +101,16 @@ onMounted(async () => {
 
 <template>
   <div>
-    <h2>{{ issue.title }}</h2>
-    <h3>
+    <div class="header-wrapper">
+      <img
+        :src="backButton"
+        alt="Back"
+        class="back-button"
+        @click="goBack"
+      />
+      <h2>{{ issue.title }}</h2>
+    </div>
+    <h3 id="issue-button">
       <a v-if="issue.pdf_file" :href="issue.pdf_file" target="_blank">
         Read full {{ issue.title }} PDF
       </a>
@@ -155,6 +168,10 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+#issue-button {
+  margin: 0px;
+}
+
 .container {
   padding: 20px;
 }
@@ -304,6 +321,21 @@ ul {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.header-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button {
+  position: absolute;
+  left: 25px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
 }
 
 @media (max-width: 1024px) {
