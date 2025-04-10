@@ -34,7 +34,7 @@ const emit = defineEmits(['close'])
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: var(--theme-2);
+  background: #707070e8;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -62,7 +62,7 @@ const emit = defineEmits(['close'])
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--theme-6);
+  background-color: var(--theme-2);
 }
 
 .close-btn > img {

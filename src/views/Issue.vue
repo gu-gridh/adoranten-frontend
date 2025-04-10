@@ -2,23 +2,24 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import linkArrow from '/src/assets/link-arrow.png'
-// import downloadButton from '/src/assets/download.png'
 import rightArrow from '/src/assets/right-arrow.png'
+// import downloadButton from '/src/assets/download.png'
 
 // access the current route
 const route = useRoute()
-
 const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.'
 const expandedArticleId = ref(null)
 const articles = ref([])
 const issue = ref([])
 const issueId = route.params.id
+const expandedArticles = ref({})
+const TRUNCATE_LIMIT = 300
 
 function downloadCitation(articleTitle, format) {
   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
   const fileName = `${sanitizedTitle}.${format}`
   const citationText = `citation for "${articleTitle}" in a .${format} file.`
-  const blob = new Blob([citationText], { type: 'text/plain' })   //blob is a file-like object ofraw data
+  const blob = new Blob([citationText], { type: 'text/plain' }) //blob is a file-like object ofraw data
 
   //create a temporary link to trigger the download because blobs can't be downloaded directly
   const link = document.createElement('a')
@@ -30,6 +31,27 @@ function downloadCitation(articleTitle, format) {
 
 function toggleDownload(articleId) {
   expandedArticleId.value = expandedArticleId.value === articleId ? null : articleId
+}
+
+function toggleExpand(articleId) {
+  expandedArticles.value[articleId] = !expandedArticles.value[articleId]
+}
+
+//check whether the article description needs an expand icon
+function needsExpandIcon(article) {
+  if (!article.article_description) return false
+  return article.article_description.length > TRUNCATE_LIMIT
+}
+
+//returns the text to display - truncated or full based on the expanded state
+function getDisplayText(article) {
+  const desc = article.article_description || ''
+  if (!needsExpandIcon(article)) {
+    return desc
+  }
+  return expandedArticles.value[article.id]
+    ? desc
+    : desc.slice(0, TRUNCATE_LIMIT) + '…'
 }
 
 onMounted(async () => {
@@ -92,7 +114,15 @@ onMounted(async () => {
 
             <div class="content">
               <h3>{{ article.title }}</h3>
-              <div v-html="article.article_description" class="article-description"></div>
+
+              <div class="article-description">
+                <p v-html="getDisplayText(article)"></p>
+              </div>
+
+              <div class="expand-toggle" v-if="needsExpandIcon(article)" @click="toggleExpand(article.id)">
+                <span v-if="!expandedArticles[article.id]">[+ Read more]</span>
+                <span v-else>[- Show less]</span>
+              </div>
 
               <div class="button-group">
                 <div class="download-dropdown">
@@ -181,11 +211,19 @@ ul {
   padding: 5px 15px 15px 15px;
 }
 
-.article-description {
+.article-description p {
   line-height: 1.6;
   font-size: 1rem;
   color: white;
   text-align: left;
+  margin: 0;
+}
+
+.expand-toggle {
+  cursor: pointer;
+  color: #fff;
+  font-weight: bold;
+  margin: 5px 0;
 }
 
 .button-group {
