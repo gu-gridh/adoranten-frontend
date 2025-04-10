@@ -73,6 +73,6 @@ h1 {
   }
 }
 
-p, h2, h3, h4, h5, h6, ul, span, a {
+p, h2, h3, h4, h5, h6, ul, span, a, input {
   font-family: 'Barlow Condensed';
 }
