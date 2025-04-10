@@ -31,14 +31,14 @@ const navigateTo = (path) => {
             Search
           </li>
           <li 
-            :class="{ active: route.path === '/about' }" 
-            @click="navigateTo('/about')">
-            About
-          </li>
-          <li 
             :class="{ active: route.path === '/accessibility' }" 
             @click="navigateTo('/accessibility')">
             Accessibility
+          </li>
+          <li 
+            :class="{ active: route.path === '/about' }" 
+            @click="navigateTo('/about')">
+            About
           </li>
         </ul>
       </nav>
