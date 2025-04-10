@@ -1,6 +1,6 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue'
-import X from '/src/assets/close.png'
+import X from '/src/assets/close.svg'
 
 defineProps({
   show: Boolean,
@@ -12,9 +12,7 @@ const emit = defineEmits(['close'])
 <template>
   <div v-if="show" class="overlay">
     <div class="overlay-content">
-      <button class="close-btn" @click="emit('close')">
-        <img :src="X" alt="Close" class="close-icon" />
-      </button>
+        <img :src="X" alt="Close" class="close-icon" @click="emit('close')" />
       <h2>Issues</h2>
       <div class="issues-list">
         <div v-for="issue in issues" :key="issue.id">
@@ -41,6 +39,15 @@ const emit = defineEmits(['close'])
   z-index: 1000; /* above everything */
 }
 
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: auto;
+  cursor: pointer;
+}
+
 .overlay-content {
   background: white;
   padding: 20px;
@@ -49,20 +56,6 @@ const emit = defineEmits(['close'])
   min-height: 50vh;
   text-align: center;
   position: relative;
-}
-
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  border: none;
-  padding: 5px;
-  cursor: pointer;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--theme-2);
 }
 
 .close-btn > img {
