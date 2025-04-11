@@ -1,12 +1,19 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
+import { ref } from 'vue'; 
 import logo from '/src/assets/logo.png'
 
 const route = useRoute();
 const router = useRouter();
+const isMenuOpen = ref(false);
 
 const navigateTo = (path) => {
   router.push(path);
+  isMenuOpen.value = false;
+};
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
 };
 </script>
 
@@ -18,7 +25,14 @@ const navigateTo = (path) => {
         <span class="site-title">Adoranten</span>
       </div>
 
-      <nav>
+      <!-- Hamburger Menu Button -->
+      <div class="hamburger" @click="toggleMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <nav :class="{ 'open': isMenuOpen }">
         <ul>
           <li 
             :class="{ active: route.path === '/' }" 
@@ -103,5 +117,68 @@ const navigateTo = (path) => {
   margin-left: 20px;
   font-size: 50px;
   color: var(--theme-4);
+}
+
+/* Hamburger implementation */
+.header-container {
+  position: relative;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background-color: #333;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+  
+  nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    width: 100%;
+    max-width: fit-content;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 5;
+    opacity: 0;
+    visibility: hidden;
+  }
+  
+  nav.open {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .header-tabs nav ul {
+    flex-direction: column;
+  }
+  
+  .header-tabs nav ul li {
+    margin: 10px 0;
+    margin-left: 0;
+    padding: 8px 0;
+  }
 }
 </style>
