@@ -40,6 +40,11 @@ const navigateTo = (path) => {
             @click="navigateTo('/about')">
             About
           </li>
+          <li 
+            :class="{ active: route.path === '/submit' }" 
+            @click="navigateTo('/submit')">
+            Submit
+          </li>
         </ul>
       </nav>
     </div>
