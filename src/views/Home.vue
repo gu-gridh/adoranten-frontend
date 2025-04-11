@@ -4,12 +4,14 @@ import 'vue3-carousel/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import linkArrow from '/src/assets/link-arrow.png'
 import hamburger from '/src/assets/menu.png'
+import loader from '/src/assets/loader.svg'
 import Overlay from '/src/views/Overlay.vue'
 import { useRouter } from 'vue-router'
 
 const description = ref('Loading...')
 const issues = ref([])
 const articles = ref([])
+const loading = ref(true)
 const latestIssue = ref(null)
 const showOverlay = ref(false)
 const router = useRouter();
@@ -37,6 +39,7 @@ const navigateToArticle = (article) => {
 
 onMounted(async () => {
   try {
+    loading.value = true;
     //fetch both home page and issues data
     const responseHome = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.HomePage&fields=*')
     const dataHome = await responseHome.json()
@@ -74,12 +77,17 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error(error)
+  } finally {
+    loading.value = false
   }
 })
 </script>
 
 <template>
-  <div id="home-container">
+  <div v-if="loading">
+    <img :src="loader" alt="Loading..." class="loader" />
+  </div>
+  <div v-else id="home-container">
     <!-- render the home page description -->
     <div v-html="description"></div>
 
@@ -138,6 +146,12 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.loader {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+}
+
 .cover-image {
   width: auto;
   height: auto;
@@ -160,7 +174,8 @@ onMounted(async () => {
 }
 
 .articles-container h2,
-.articles-container .article-title, .latest-container h2 {
+.articles-container .article-title,
+.latest-container h2 {
   color: var(--theme-2);
 }
 
