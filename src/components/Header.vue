@@ -147,6 +147,10 @@ const toggleMenu = () => {
   .hamburger {
     display: flex;
   }
+
+  .site-logo {
+    height: 50px;
+  }
   
   nav {
     position: absolute;
