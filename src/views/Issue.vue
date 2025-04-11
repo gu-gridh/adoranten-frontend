@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import linkArrow from '/src/assets/link-arrow.png'
 import rightArrow from '/src/assets/right-arrow.png'
 import backButton from '/src/assets/back-button.svg'
-// import downloadButton from '/src/assets/download.png'
+import { adorantenStore } from "/src/stores/store.js";
 
 // access the current route
 const route = useRoute()
@@ -15,12 +15,13 @@ const issue = ref([])
 const issueId = route.params.id
 const expandedArticles = ref({})
 const TRUNCATE_LIMIT = 300
+const store = adorantenStore();
 
 function downloadCitation(articleTitle, format) {
   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
   const fileName = `${sanitizedTitle}.${format}`
   const citationText = `citation for "${articleTitle}" in a .${format} file.`
-  const blob = new Blob([citationText], { type: 'text/plain' }) //blob is a file-like object ofraw data
+  const blob = new Blob([citationText], { type: 'text/plain' })  //blob is a file-like object ofraw data
 
   //create a temporary link to trigger the download because blobs can't be downloaded directly
   const link = document.createElement('a')
@@ -57,6 +58,11 @@ function getDisplayText(article) {
   return expandedArticles.value[article.id]
     ? desc
     : desc.slice(0, TRUNCATE_LIMIT) + '…'
+}
+
+function setKeyword(tag) {
+  store.keyword = tag;
+  console.log('Keyword set to:', store.keyword);
 }
 
 onMounted(async () => {
@@ -122,9 +128,9 @@ onMounted(async () => {
         <li v-for="article in articles" :key="article.id" :id="'article-' + article.id" class="article-list-item">
           <div class="article-box">
             <div class="image-container">
-          <img v-if="article.image?.meta?.download_url" :src="article.image.meta.download_url" :alt="article.title" />
-          <img v-else-if="issue?.image?.meta?.download_url" :src="issue.image.meta.download_url" :alt="article.title" />
-        </div>
+              <img v-if="article.image?.meta?.download_url" :src="article.image.meta.download_url" :alt="article.title" />
+              <img v-else-if="issue?.image?.meta?.download_url" :src="issue.image.meta.download_url" :alt="article.title" />
+            </div>
 
             <div class="content">
               <h3>{{ article.title }}</h3>
@@ -136,6 +142,12 @@ onMounted(async () => {
               <div class="expand-toggle" v-if="needsExpandIcon(article)" @click="toggleExpand(article.id)">
                 <span v-if="!expandedArticles[article.id]">[+ Read more]</span>
                 <span v-else>[- Show less]</span>
+              </div>
+
+              <div class="tags-row">
+                <span class="keyword-tag" @click="setKeyword('TagOne')">#TagOne</span>
+                <span class="keyword-tag" @click="setKeyword('TagTwo')">#TagTwo</span>
+                <span class="keyword-tag" @click="setKeyword('TagThree')">#TagThree</span>
               </div>
 
               <div class="button-group">
@@ -213,6 +225,7 @@ ul {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top;
   transition: transform 0.3s ease-in-out;
 }
 
@@ -244,6 +257,24 @@ ul {
   margin: 5px 0;
 }
 
+.tags-row {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.keyword-tag {
+  background: grey;
+  border-radius: 8px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.keyword-tag:hover {
+  background: #fff;
+  color: #000;
+}
+
 .button-group {
   display: flex;
   justify-content: space-between;
@@ -269,11 +300,6 @@ ul {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.download-icon {
-  width: 20px;
-  height: 20px;
 }
 
 .arrow-icon {
