@@ -121,9 +121,10 @@ onMounted(async () => {
       <ul v-else>
         <li v-for="article in articles" :key="article.id" :id="'article-' + article.id" class="article-list-item">
           <div class="article-box">
-            <div v-if="article.image?.meta?.download_url" class="image-container">
-              <img :src="article.image.meta.download_url" :alt="article.title" />
-            </div>
+            <div class="image-container">
+          <img v-if="article.image?.meta?.download_url" :src="article.image.meta.download_url" :alt="article.title" />
+          <img v-else-if="issue?.image?.meta?.download_url" :src="issue.image.meta.download_url" :alt="article.title" />
+        </div>
 
             <div class="content">
               <h3>{{ article.title }}</h3>
