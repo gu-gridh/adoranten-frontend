@@ -31,6 +31,11 @@ const navigateTo = (path) => {
             Search
           </li>
           <li 
+            :class="{ active: route.path === '/submit' }" 
+            @click="navigateTo('/submit')">
+            Submit
+          </li>
+          <li 
             :class="{ active: route.path === '/accessibility' }" 
             @click="navigateTo('/accessibility')">
             Accessibility
@@ -39,11 +44,6 @@ const navigateTo = (path) => {
             :class="{ active: route.path === '/about' }" 
             @click="navigateTo('/about')">
             About
-          </li>
-          <li 
-            :class="{ active: route.path === '/submit' }" 
-            @click="navigateTo('/submit')">
-            Submit
           </li>
         </ul>
       </nav>
