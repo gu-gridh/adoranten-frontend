@@ -24,7 +24,6 @@
   color: var(--theme-8);
   padding: 15px;
   width: 100%;
-  font-family: Barlow Condensed,sans-serif;
   display: flex;
   justify-content: space-between;
   text-align: left;

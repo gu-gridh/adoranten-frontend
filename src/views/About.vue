@@ -104,7 +104,6 @@ color: #fff;
 border: none;
 border-radius: 3px;
 cursor: pointer;
-font-family: system-ui, Helvetica, Arial, sans-serif;;
 }
 
 button:hover {
