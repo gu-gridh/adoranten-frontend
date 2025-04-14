@@ -16,6 +16,7 @@ const issueId = route.params.id
 const expandedArticles = ref({})
 const TRUNCATE_LIMIT = 300
 const store = adorantenStore();
+const showCitationBox = ref(null) 
 
 function downloadCitation(articleTitle, format) {
   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
@@ -29,6 +30,14 @@ function downloadCitation(articleTitle, format) {
   link.download = fileName
   link.click()
   URL.revokeObjectURL(link.href)
+}
+
+function toggleCitation(articleId) {
+  showCitationBox.value = showCitationBox.value === articleId ? null : articleId
+  // Close download options if citation box is opened
+  if (expandedArticleId.value === articleId) {
+    expandedArticleId.value = null
+  }
 }
 
 function goBack() { //back one step in history
@@ -167,11 +176,23 @@ onMounted(async () => {
                   </div>
                 </div>
 
+                <button class="download-main-button" @click="toggleCitation(article.id)">
+                  <span>Copy Citation</span>
+                  <img :src="rightArrow" alt="Toggle Citation Box" class="arrow-icon" />
+                </button>
+
                 <a v-if="article.pdf_file" :href="article.pdf_file" target="_blank" class="pdf-link">
                   <span>Read PDF</span>
                   <img :src="linkArrow" alt="Right Arrow Icon" class="arrow-icon" />
                 </a>
               </div>
+
+              <div v-if="showCitationBox === article.id" class="citation-box">
+  <div class="citation-content">
+    <p>{{ article.title }}</p>
+    <div class="citation-note">Select the text above to copy</div>
+  </div>
+</div>
             </div>
           </div>
         </li>
@@ -335,6 +356,30 @@ ul {
 
 .format-option:hover {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+.citation-box {
+  margin-top: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 10px;
+  position: relative;
+}
+
+.citation-content p {
+  margin: 0;
+  font-style: italic;
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  user-select: all; /* Makes it easier to select all text */
+}
+
+.citation-note {
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 5px;
+  text-align: right;
 }
 
 .pdf-link {
