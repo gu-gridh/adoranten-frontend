@@ -372,7 +372,7 @@ ul {
   padding: 5px;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
-  user-select: all; /* Makes it easier to select all text */
+  user-select: all;
 }
 
 .citation-note {
