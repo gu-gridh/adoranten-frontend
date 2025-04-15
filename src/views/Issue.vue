@@ -16,7 +16,7 @@ const issueId = route.params.id
 const expandedArticles = ref({})
 const TRUNCATE_LIMIT = 300
 const store = adorantenStore();
-const showCitationBox = ref(null) 
+const showCitationBox = ref(null)
 
 function downloadCitation(articleTitle, format) {
   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
@@ -117,12 +117,7 @@ onMounted(async () => {
 <template>
   <div>
     <div class="header-wrapper">
-      <img
-        :src="backButton"
-        alt="Back"
-        class="back-button"
-        @click="goBack"
-      />
+      <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
       <h2>{{ issue.title }}</h2>
     </div>
     <h3 id="issue-button">
@@ -137,8 +132,10 @@ onMounted(async () => {
         <li v-for="article in articles" :key="article.id" :id="'article-' + article.id" class="article-list-item">
           <div class="article-box">
             <div class="image-container">
-              <img v-if="article.image?.meta?.download_url" :src="article.image.meta.download_url" :alt="article.title" />
-              <img v-else-if="issue?.image?.meta?.download_url" :src="issue.image.meta.download_url" :alt="article.title" />
+              <img v-if="article.image?.meta?.download_url" :src="article.image.meta.download_url"
+                :alt="article.title" />
+              <img v-else-if="issue?.image?.meta?.download_url" :src="issue.image.meta.download_url"
+                :alt="article.title" />
             </div>
 
             <div class="content">
@@ -153,46 +150,48 @@ onMounted(async () => {
                 <span v-else>[- Show less]</span>
               </div>
 
-              <div class="tags-row">
-                <span class="keyword-tag" @click="setKeyword('TagOne')">#TagOne</span>
-                <span class="keyword-tag" @click="setKeyword('TagTwo')">#TagTwo</span>
-                <span class="keyword-tag" @click="setKeyword('TagThree')">#TagThree</span>
-              </div>
-
-              <div class="button-group">
-                <div class="download-dropdown">
-                  <button class="download-main-button" @click.stop="toggleDownload(article.id)">
-                    <span>Download Citation</span>
-                    <img :src="rightArrow" alt="Toggle Download Options" class="arrow-icon" />
-                  </button>
-
-                  <div v-if="expandedArticleId === article.id" class="download-submenu">
-                    <button class="format-option" @click="downloadCitation(article.title, 'bibtex')">
-                      (bibtex)
-                    </button>
-                    <button class="format-option" @click="downloadCitation(article.title, 'ris')">
-                      (ris)
-                    </button>
-                  </div>
+              <div class="bottom-bar">
+                <div class="tags-row">
+                  <span class="keyword-tag" @click="setKeyword('TagOne')">#TagOne</span>
+                  <span class="keyword-tag" @click="setKeyword('TagTwo')">#TagTwo</span>
+                  <span class="keyword-tag" @click="setKeyword('TagThree')">#TagThree</span>
                 </div>
 
-                <button class="download-main-button" @click="toggleCitation(article.id)">
-                  <span>Copy Citation</span>
-                  <img :src="rightArrow" alt="Toggle Citation Box" class="arrow-icon" />
-                </button>
+                <div class="button-group">
+                  <div class="download-dropdown">
+                    <button class="download-main-button" @click.stop="toggleDownload(article.id)">
+                      <span>Download Citation</span>
+                      <img :src="rightArrow" alt="Toggle Download Options" class="arrow-icon" />
+                    </button>
 
-                <a v-if="article.pdf_file" :href="article.pdf_file" target="_blank" class="pdf-link">
-                  <span>Read PDF</span>
-                  <img :src="linkArrow" alt="Right Arrow Icon" class="arrow-icon" />
-                </a>
+                    <div v-if="expandedArticleId === article.id" class="download-submenu">
+                      <button class="format-option" @click="downloadCitation(article.title, 'bibtex')">
+                        (bibtex)
+                      </button>
+                      <button class="format-option" @click="downloadCitation(article.title, 'ris')">
+                        (ris)
+                      </button>
+                    </div>
+                  </div>
+
+                  <button class="download-main-button" @click="toggleCitation(article.id)">
+                    <span>Copy Citation</span>
+                    <img :src="rightArrow" alt="Toggle Citation Box" class="arrow-icon" />
+                  </button>
+
+                  <a v-if="article.pdf_file" :href="article.pdf_file" target="_blank" class="pdf-link">
+                    <span>Read PDF</span>
+                    <img :src="linkArrow" alt="Right Arrow Icon" class="arrow-icon" />
+                  </a>
+                </div>
               </div>
 
               <div v-if="showCitationBox === article.id" class="citation-box">
-  <div class="citation-content">
-    <p>{{ article.title }}</p>
-    <div class="citation-note">Select the text above to copy</div>
-  </div>
-</div>
+                <div class="citation-content">
+                  <p>{{ article.title }}</p>
+                  <div class="citation-note">Select the text above to copy</div>
+                </div>
+              </div>
             </div>
           </div>
         </li>
@@ -202,6 +201,10 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.bottom-bar {
+  margin-top: auto;
+}
+
 #issue-button {
   margin: 0px;
 }
