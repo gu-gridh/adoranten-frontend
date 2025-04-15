@@ -26,14 +26,14 @@ const toggleOverlay = () => {
 }
 
 const navigateToArticle = (article) => {
-  if (article.id) {
+  if (article.issue_id && article.id) {
     router.push({
       name: 'Issue',
-      params: { id: article.id },
+      params: { id: article.issue_id },
       hash: `#article-${article.id}`
     })
   } else {
-    console.log('no issue id')
+    console.log('no issue id or article id')
   }
 }
 
