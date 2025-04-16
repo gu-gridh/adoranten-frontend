@@ -173,6 +173,7 @@ const toggleMenu = () => {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
+    z-index: 9999;
   }
   
   .header-tabs nav ul {
