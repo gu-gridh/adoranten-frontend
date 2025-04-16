@@ -260,7 +260,7 @@ img {
   bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--theme-2);
+  background: var(--theme-1);
   color: white;
   border: none;
   padding: 8px 12px;

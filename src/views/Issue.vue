@@ -1,13 +1,15 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import linkArrow from '/src/assets/link-arrow.png'
 import rightArrow from '/src/assets/right-arrow.png'
+import downArrow from '/src/assets/down-arrow.png'
 import backButton from '/src/assets/back-button.svg'
 import { adorantenStore } from "/src/stores/store.js";
 
 // access the current route
 const route = useRoute()
+const router = useRouter()
 const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.'
 const expandedArticleId = ref(null)
 const articles = ref([])
@@ -72,6 +74,7 @@ function getDisplayText(article) {
 function setKeyword(tag) {
   store.keyword = tag;
   console.log('Keyword set to:', store.keyword);
+  router.push({ name: 'Search' })
 }
 
 onMounted(async () => {
@@ -136,6 +139,10 @@ onMounted(async () => {
                 :alt="article.title" />
               <img v-else-if="issue?.image?.meta?.download_url" :src="issue.image.meta.download_url"
                 :alt="article.title" />
+              <a v-if="article.pdf_file" :href="article.pdf_file" target="_blank" class="pdf-button">
+                <span>Read PDF</span>
+                <img :src="linkArrow" alt="Right Arrow Icon" class="arrow-icon" />
+              </a>
             </div>
 
             <div class="content">
@@ -152,9 +159,12 @@ onMounted(async () => {
 
               <div class="bottom-bar">
                 <div class="tags-row">
-                  <span class="keyword-tag" @click="setKeyword('TagOne')">#TagOne</span>
-                  <span class="keyword-tag" @click="setKeyword('TagTwo')">#TagTwo</span>
-                  <span class="keyword-tag" @click="setKeyword('TagThree')">#TagThree</span>
+                  <template v-if="article.tags && article.tags.length">
+                    <span v-for="(tag, index) in article.tags" :key="index" class="keyword-tag"
+                      @click="setKeyword(tag)">
+                      #{{ tag }}
+                    </span>
+                  </template>
                 </div>
 
                 <div class="button-group">
@@ -163,26 +173,16 @@ onMounted(async () => {
                       <span>Download Citation</span>
                       <img :src="rightArrow" alt="Toggle Download Options" class="arrow-icon" />
                     </button>
-
                     <div v-if="expandedArticleId === article.id" class="download-submenu">
-                      <button class="format-option" @click="downloadCitation(article.title, 'bibtex')">
-                        (bibtex)
-                      </button>
-                      <button class="format-option" @click="downloadCitation(article.title, 'ris')">
-                        (ris)
-                      </button>
+                      <button class="format-option" @click="downloadCitation(article.title, 'bibtex')">(bibtex)</button>
+                      <button class="format-option" @click="downloadCitation(article.title, 'ris')">(ris)</button>
                     </div>
                   </div>
 
                   <button class="download-main-button" @click="toggleCitation(article.id)">
                     <span>Copy Citation</span>
-                    <img :src="rightArrow" alt="Toggle Citation Box" class="arrow-icon" />
+                    <img :src="downArrow" alt="Toggle Citation Box" class="arrow-icon" />
                   </button>
-
-                  <a v-if="article.pdf_file" :href="article.pdf_file" target="_blank" class="pdf-link">
-                    <span>Read PDF</span>
-                    <img :src="linkArrow" alt="Right Arrow Icon" class="arrow-icon" />
-                  </a>
                 </div>
               </div>
 
@@ -201,6 +201,36 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.pdf-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--theme-1);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 1;
+  font-size: 1rem;
+}
+
+.pdf-button .arrow-icon {
+  width: 20px;
+  height: 20px;
+}
+
 .bottom-bar {
   margin-top: auto;
 }

@@ -1,14 +1,17 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import articleIcon from '/src/assets/article.png'
 import issueIcon from '/src/assets/issue.png'
+import { adorantenStore } from '/src/stores/store.js'
 
 const description = ref('Loading...')
 const searchTerm = ref('')
-const allArticles = ref([]) //holds the full list of articles fetched on mount
-const results = ref([]) //filtered results that we display
+const allArticles = ref([]) // holds the full list of articles fetched on mount
+const results = ref([]) // filtered results that we display
 const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type='
 const useLazyLoading = ref(false) // toggle between eager and lazy loading implementations
+
+const store = adorantenStore()
 
 // function for processing articles to match the structure needed for display
 const processArticles = (articlesData, allArticles) => {
@@ -60,7 +63,7 @@ onMounted(async () => {
       description.value = 'No search page content found'
     }
   } catch (error) {
-    console.error('error fetching search page data:', error)
+    console.error(error)
     description.value = 'error loading search page content'
   }
 
@@ -93,15 +96,17 @@ onMounted(async () => {
       const end = performance.now();
       console.log(`Eager load initial rendering took ${(end - start).toFixed(2)} ms`);
     } catch (error) {
-      console.error('error fetching issues or articles:', error);
+      console.error(error)
     }
-  }
-  else {
+  } else {
     const end = performance.now()
     console.log(`Lazy load initial rendering took ${(end - start).toFixed(2)} ms`)
   }
-
 })
+
+onUnmounted(() => {
+  store.keyword = '';
+});
 
 //filter local articles array when searchTerm changes
 watch(searchTerm, async (newValue) => {
@@ -118,7 +123,7 @@ watch(searchTerm, async (newValue) => {
       // Fetch issues
       const issuesResponse = await fetch(`${baseURL}journal.IssuePage&search=${encodeURIComponent(newValue)}`)
       console.log(issuesResponse);
-      
+
       const issuesData = await issuesResponse.json()
 
       // Fetch articles
@@ -141,6 +146,7 @@ watch(searchTerm, async (newValue) => {
     // Use original eager loading implementation, with added performance check
     if (!newValue) {
       results.value = [];
+      store.keyword = '';
     } else {
       const start = performance.now()
       results.value = allArticles.value.filter(item => {
@@ -152,6 +158,28 @@ watch(searchTerm, async (newValue) => {
     }
   }
 })
+
+watch(() => store.keyword, async (newKeyword) => {
+  if (newKeyword && newKeyword !== 'keyword') {
+    searchTerm.value = newKeyword
+
+    const tagURL = `https://shfa.dh.gu.se/wagtail/api/v2/articles/?tag=${encodeURIComponent(newKeyword)}`
+    try {
+      const response = await fetch(tagURL)
+      if (!response.ok) {
+        throw new Error('bad connection')
+      }
+      const data = await response.json()
+      results.value = Array.isArray(data) ? data : (data.items || []);
+      console.log(results.value);
+    } catch (error) {
+      console.error(error)
+    }
+  } else {
+    searchTerm.value = ''
+    results.value = []
+  }
+},  { immediate: true })
 </script>
 
 <template>
@@ -164,18 +192,16 @@ watch(searchTerm, async (newValue) => {
       <div v-for="item in results" :key="item.id" class="search-item">
         <img v-if="!item.isArticle" :src="issueIcon" alt="Issue Icon" class="search-icon" />
         <img v-else :src="articleIcon" alt="Article Icon" class="search-icon" />
-
         <!-- For normal issues -->
         <router-link v-if="!item.isArticle" :to="{ name: 'Issue', params: { id: item.id } }">
           {{ item.title }}
         </router-link>
-
         <!-- For articles -->
         <router-link v-else-if="item.issueId" :to="{
-          name: 'Issue',
-          params: { id: item.issueId },
-          hash: '#article-' + item.id
-        }">
+            name: 'Issue',
+            params: { id: item.issueId },
+            hash: '#article-' + item.id
+            }">
           {{ item.title }} (Article)
         </router-link>
       </div>
@@ -184,6 +210,13 @@ watch(searchTerm, async (newValue) => {
 </template>
 
 <style scoped>
+.search-container {
+  position: relative;
+  width: 50%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
 .search-input {
   width: 100%;
   padding: 8px;
@@ -191,13 +224,6 @@ watch(searchTerm, async (newValue) => {
   border: 1px solid var(--theme-5);
   border-radius: 4px;
   font-size: 1.4em;
-  box-sizing: border-box;
-}
-
-.search-container {
-  position: relative;
-  width: 50%;
-  margin: 0 auto;
   box-sizing: border-box;
 }
 
