@@ -3,6 +3,7 @@ import { ref, onMounted, watch, onUnmounted } from 'vue'
 import articleIcon from '/src/assets/article.png'
 import issueIcon from '/src/assets/issue.png'
 import { adorantenStore } from '/src/stores/store.js'
+import backButton from '/src/assets/back-button.svg'
 
 const description = ref('Loading...')
 const searchTerm = ref('')
@@ -12,6 +13,10 @@ const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type='
 const useLazyLoading = ref(false) // toggle between eager and lazy loading implementations
 
 const store = adorantenStore()
+
+function goBack() {
+  history.back()
+}
 
 // function for processing articles to match the structure needed for display
 const processArticles = (articlesData, allArticles) => {
@@ -183,7 +188,10 @@ watch(() => store.keyword, async (newKeyword) => {
 </script>
 
 <template>
-  <p v-html="description"></p>
+  <div class="header-wrapper">
+      <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
+      <p v-html="description"></p>
+  </div>
 
   <div class="search-container">
     <input v-model="searchTerm" type="text" placeholder="Search for issues and articles..." class="search-input" />
@@ -256,5 +264,20 @@ watch(() => store.keyword, async (newKeyword) => {
 
 .search-item:hover {
   background-color: #e2e2e2;
+}
+
+.header-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button {
+  position: absolute;
+  left: 25px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
 }
 </style>
