@@ -321,4 +321,10 @@ img {
   /*override the active button color for carousel*/
   background-color: #b02b27 !important;
 }
+
+@media screen and (max-width: 768px) {
+  #home-container > div.carousel-container > section > ol {
+    display: none;
+  }
+}
 </style>
