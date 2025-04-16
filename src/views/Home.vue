@@ -155,8 +155,12 @@ onMounted(async () => {
 .cover-image {
   width: auto;
   height: auto;
-  max-width: 200px;
+  max-width: 250px;
   object-fit: contain;
+}
+
+.cover-image:hover {
+  transform: scale(1.03);
 }
 
 .articles-container {
