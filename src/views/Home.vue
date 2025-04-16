@@ -37,6 +37,17 @@ const navigateToArticle = (article) => {
   }
 }
 
+const navigateToIssue = (article) => {
+  if (article.id) {
+    router.push({
+      name: 'Issue',
+      params: { id: article.id },
+    })
+  } else {
+    console.log('no issue id')
+  }
+}
+
 onMounted(async () => {
   try {
     loading.value = true;
@@ -125,7 +136,8 @@ onMounted(async () => {
 
     <div v-if="latestIssue" class="latest-container">
       <h2>Latest Issue</h2>
-      <img :src="latestIssue.image.file" :alt="latestIssue.image.title" class="cover-image" />
+      <img :src="latestIssue.image.file" :alt="latestIssue.image.title" class="cover-image"
+        @click="navigateToIssue(latestIssue)" />
     </div>
 
     <!-- Articles Display -->
@@ -217,7 +229,8 @@ onMounted(async () => {
   font-size: 1rem;
 }
 
-h2, h3 {
+h2,
+h3 {
   color: white;
 }
 
@@ -293,7 +306,8 @@ img {
 
 .carousel__slide {
   width: 30% !important;
-  margin: 0 5%; /* top no margin, left and right 5% */
+  margin: 0 5%;
+  /* top no margin, left and right 5% */
 }
 
 .carousel {
@@ -303,7 +317,8 @@ img {
   --vc-nav-border-radius: 100%;
 }
 
-::v-deep(.carousel__pagination-button--active) { /*override the active button color for carousel*/
+::v-deep(.carousel__pagination-button--active) {
+  /*override the active button color for carousel*/
   background-color: #b02b27 !important;
 }
 </style>
