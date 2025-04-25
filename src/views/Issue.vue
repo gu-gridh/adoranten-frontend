@@ -56,13 +56,13 @@ function toggleExpand(articleId) {
 
 //check whether the article description needs an expand icon
 function needsExpandIcon(article) {
-  if (!article.article_description) return false
-  return article.article_description.length > TRUNCATE_LIMIT
+  if (!article.description) return false
+  return article.description.length > TRUNCATE_LIMIT
 }
 
 //returns the text to display - truncated or full based on the expanded state
 function getDisplayText(article) {
-  const desc = article.article_description || ''
+  const desc = article.description || ''
   if (!needsExpandIcon(article)) {
     return desc
   }
@@ -188,7 +188,7 @@ onMounted(async () => {
 
               <div v-if="showCitationBox === article.id" class="citation-box">
                 <div class="citation-content">
-                  <p>{{ article.title }}</p>
+                  <div v-html="article.citation"></div>
                   <div class="citation-note">Select the text above to copy</div>
                 </div>
               </div>
@@ -397,6 +397,7 @@ ul {
   border-radius: 5px;
   padding: 10px;
   position: relative;
+  font-synthesis: weight style !important;
 }
 
 .citation-content p {
