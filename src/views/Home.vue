@@ -185,7 +185,7 @@ onMounted(async () => {
 }
 
 .text-column {
-  width: 600px;
+  width: 300px;
   text-overflow: ellipsis;
   text-align: left;
   margin-left: 2rem;
@@ -212,7 +212,7 @@ onMounted(async () => {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 2rem;
   margin: 2rem auto;
 }
 
