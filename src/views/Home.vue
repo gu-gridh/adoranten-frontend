@@ -134,10 +134,14 @@ onMounted(async () => {
       <p>No issues found</p>
     </div>
 
+    <h2 v-if="latestIssue" class="latest-title">Latest Issue: {{ latestIssue.title }}</h2>
     <div v-if="latestIssue" class="latest-container">
-      <h2>Latest Issue</h2>
-      <img :src="latestIssue.image.file" :alt="latestIssue.image.title" class="cover-image"
-        @click="navigateToIssue(latestIssue)" />
+      <img ref="coverImg" :src="latestIssue.image.file" :alt="latestIssue.image.title" class="cover-image"
+        @load="onImageLoad" @click="navigateToIssue(latestIssue)" />
+
+      <div class="text-column">
+        <p v-html="latestIssue.description" </p>
+      </div>
     </div>
 
     <!-- Articles Display -->
@@ -165,10 +169,27 @@ onMounted(async () => {
 }
 
 .cover-image {
-  width: auto;
   height: auto;
-  max-width: 250px;
   object-fit: contain;
+  cursor: pointer;
+}
+
+.text-column {
+  overflow-y: hidden;
+  white-space: normal;
+}
+
+.cover-image {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.text-column {
+  width: 600px;
+  text-overflow: ellipsis;
+  text-align: left;
+  margin-left: 2rem;
+  margin-top: 0rem;
 }
 
 .cover-image:hover {
@@ -181,8 +202,18 @@ onMounted(async () => {
   text-align: left;
 }
 
+.latest-title {
+  color: var(--theme-2);
+  text-align: center;
+  margin-top: 2rem;
+}
+
 .latest-container {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 2rem auto;
 }
 
 .articles-container h2 {
@@ -323,7 +354,7 @@ img {
 }
 
 @media screen and (max-width: 768px) {
-  #home-container > div.carousel-container > section > ol {
+  #home-container>div.carousel-container>section>ol {
     display: none;
   }
 }
