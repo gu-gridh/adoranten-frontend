@@ -231,10 +231,6 @@ onMounted(async () => {
   height: 20px;
 }
 
-.bottom-bar {
-  margin-top: auto;
-}
-
 #issue-button {
   margin: 0px;
 }
@@ -291,7 +287,7 @@ ul {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   color: white;
   padding: 5px 15px 15px 15px;
 }
@@ -301,6 +297,7 @@ ul {
   font-size: 1rem;
   color: white;
   text-align: left;
+  min-height: 30px;
   margin: 0;
 }
 
