@@ -4,7 +4,6 @@ import Issue from '../views/Issue.vue'
 import Search from '../views/Search.vue'
 import About from '../views/About.vue'
 import Accessibility from '../views/Accessibility.vue'
-import Submit from '../views/Submit.vue'
 
 const routes = [
   {
@@ -36,7 +35,7 @@ const routes = [
   {
     path: '/submit',
     name: 'Submit',
-    component: Submit
+    component: About
   }
 ]
 

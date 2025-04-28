@@ -3,9 +3,9 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: #213547;
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -27,7 +27,6 @@
   --theme-5: #ddd;
   /* This is an even light border color  */
 
-  
   --theme-8: #f0f0f0;
   /* This is the bright footer font color */
 }
