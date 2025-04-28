@@ -24,7 +24,7 @@ function downloadCitation(articleTitle, format) {
   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
   const fileName = `${sanitizedTitle}.${format}`
   const citationText = `citation for "${articleTitle}" in a .${format} file.`
-  const blob = new Blob([citationText], { type: 'text/plain' })  //blob is a file-like object ofraw data
+  const blob = new Blob([citationText], { type: 'text/plain' })  //blob is a file-like object of raw data
 
   //create a temporary link to trigger the download because blobs can't be downloaded directly
   const link = document.createElement('a')
@@ -146,7 +146,7 @@ onMounted(async () => {
             </div>
 
             <div class="content">
-              <h3>{{ article.title }}</h3>
+              <h3 class="article-title">{{ article.title }}</h3>
 
               <div class="article-description">
                 <p v-html="getDisplayText(article)"></p>
@@ -185,12 +185,12 @@ onMounted(async () => {
                   </button>
                 </div>
               </div>
+            </div>
 
-              <div v-if="showCitationBox === article.id" class="citation-box">
-                <div class="citation-content">
-                  <div v-html="article.citation"></div>
-                  <div class="citation-note">Select the text above to copy</div>
-                </div>
+            <div v-if="showCitationBox === article.id" class="citation-box">
+              <div class="citation-content">
+                <div v-html="article.citation"></div>
+                <div class="citation-note">Select the text above to copy</div>
               </div>
             </div>
           </div>
@@ -246,6 +246,7 @@ ul {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  align-items: flex-start;
 }
 
 .article-list-item {
@@ -261,14 +262,7 @@ ul {
   flex-direction: column;
   height: 100%;
   overflow: visible;
-}
-
-.image-container {
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  filter: drop-shadow(0 0 0.25rem rgb(128, 128, 128));
 }
 
 .image-container img {
@@ -292,6 +286,11 @@ ul {
   padding: 5px 15px 15px 15px;
 }
 
+.article-title {
+  min-height: 48px;
+  margin: 0 0 8px 0;
+}
+
 .article-description p {
   line-height: 1.6;
   font-size: 1rem;
@@ -308,10 +307,23 @@ ul {
   margin: 5px 0;
 }
 
+.bottom-bar {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
 .tags-row {
   display: flex;
   gap: 8px;
-  margin: 10px 0;
 }
 
 .keyword-tag {
@@ -324,14 +336,6 @@ ul {
 .keyword-tag:hover {
   background: #fff;
   color: #000;
-}
-
-.button-group {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  position: relative;
 }
 
 .download-dropdown {
@@ -393,8 +397,7 @@ ul {
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   padding: 10px;
-  position: relative;
-  font-synthesis: weight style !important;
+  color: white;
 }
 
 .citation-content p {
@@ -411,19 +414,6 @@ ul {
   color: #ccc;
   margin-top: 5px;
   text-align: right;
-}
-
-.pdf-link {
-  background: var(--theme-2);
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .header-wrapper {
