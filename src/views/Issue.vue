@@ -182,7 +182,7 @@ onMounted(async () => {
 
                 <div class="button-group">
                   <div class="download-dropdown">
-                    <button class="download-main-button" @click.stop="toggleDownload(article.id)">
+                    <button class="download-main-button" :class="{ 'disabled-button': !article.citation }" @click.stop="toggleDownload(article.id)">
                       <span>Download Citation</span>
                       <img :src="rightArrow" alt="Toggle Download Options" class="arrow-icon" />
                     </button>
@@ -192,7 +192,7 @@ onMounted(async () => {
                     </div>
                   </div>
 
-                  <button class="download-main-button" @click="toggleCitation(article.id)">
+                  <button class="download-main-button" :class="{ 'disabled-button': !article.citation }" @click="toggleCitation(article.id)">
                     <span>Copy Citation</span>
                     <img :src="downArrow" alt="Toggle Citation Box" class="arrow-icon" />
                   </button>
@@ -223,6 +223,11 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.disabled-button {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
 .overlay {
   position: fixed;
   top: 0;
