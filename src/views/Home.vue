@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import 'vue3-carousel/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import linkArrow from '/src/assets/link-arrow.png'
@@ -14,25 +14,35 @@ const articles = ref([])
 const loading = ref(true)
 const latestIssue = ref(null)
 const showOverlay = ref(false)
-const router = useRouter();
+const router = useRouter()
 
 const coverImg = ref(null)
 const coverHeight = ref(0)
 
+const expandedLatest = ref(false)
+const showExpandToggle = ref(false)
+const textWrapper = ref(null)
+
 const onImageLoad = () => {
   if (coverImg.value) {
     coverHeight.value = coverImg.value.clientHeight
+    updateToggle()
   }
 }
+
+const updateToggle = () => nextTick(() => {
+  if (textWrapper.value && coverHeight.value) {
+    showExpandToggle.value = textWrapper.value.scrollHeight > coverHeight.value
+  }
+})
 
 const carouselConfig = {
   itemsToShow: 2.5,
   wrapAround: true,
 }
 
-const toggleOverlay = () => {
-  showOverlay.value = !showOverlay.value
-}
+const toggleOverlay = () => (showOverlay.value = !showOverlay.value)
+const toggleExpand = () => (expandedLatest.value = !expandedLatest.value)
 
 const navigateToArticle = (article) => {
   if (article.issue_id && article.id) {
@@ -101,6 +111,8 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 </script>
 
 <template>
@@ -117,12 +129,12 @@ onMounted(async () => {
         <img :src="hamburger" alt="Menu" class="hamburger-icon" />
       </button>
       <h2>Issues</h2>
-      <Carousel v-bind="carouselConfig">
+      <Carousel  v-bind="carouselConfig">
         <Slide v-for="issue in issues" :key="issue.id">
           <div class="carousel__item">
             <div class="image-container">
               <img v-if="issue.image && issue.image.meta && issue.image.meta.download_url"
-                :src="issue.image.meta.download_url" alt="Issue Cover" />
+              :src="issue.image.meta.download_url" alt="Issue Cover" />
               <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
                 <button class="view-button">
                   <span>View Issue</span>
@@ -154,8 +166,15 @@ onMounted(async () => {
         </button>
       </div>
 
-      <div class="text-column" :style="{ maxHeight: coverHeight + 'px' }">
-        <p v-html="latestIssue.description"></p>
+      <div class="text-column" :class="{ expanded: expandedLatest }">
+        <div class="text-wrapper" ref="textWrapper" :style="expandedLatest ? {} : { maxHeight: coverHeight + 'px' }">
+          <p v-html="latestIssue.description"></p>
+        </div>
+
+        <div v-if="showExpandToggle" class="expand-toggle" @click.stop="toggleExpand">
+          <span v-if="!expandedLatest">[+ Read more]</span>
+          <span v-else>[- Show less]</span>
+        </div>
       </div>
     </div>
 
@@ -167,7 +186,7 @@ onMounted(async () => {
           :style="article.issueId ? 'cursor: pointer' : ''">
           <div class="image-container">
             <img v-if="article.image && article.image.file" :src="article.image.file" :alt="article.title"
-              class="article-image" />
+            class="article-image" />
             <button class="view-button">
               <span>View&nbsp;Article</span>
               <img :src="linkArrow" alt="Arrow Icon" class="arrow-icon" />
@@ -195,16 +214,6 @@ onMounted(async () => {
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
-}
-
-.text-column {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 12;
-}
-
-.cover-image {
   width: 300px;
   flex-shrink: 0;
 }
@@ -215,10 +224,6 @@ onMounted(async () => {
   text-align: left;
   margin-left: 2rem;
   margin-top: 0rem;
-}
-
-.cover-image:hover {
-  transform: scale(1.03);
 }
 
 .articles-container {
@@ -239,10 +244,6 @@ onMounted(async () => {
   align-items: flex-start;
   gap: 2rem;
   margin: 2rem auto;
-}
-
-.articles-container h2 {
-  text-align: center;
 }
 
 .articles-container h2,
@@ -266,7 +267,8 @@ onMounted(async () => {
   text-align: left;
 }
 
-.articles-container .image-container img {
+.articles-container .image-container img,
+.latest-container .image-container img {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
   border-radius: 8px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -274,7 +276,7 @@ onMounted(async () => {
 
 .article-card:hover .article-image {
   transform: scale(1.03);
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.12);
 }
 
 .article-image {
@@ -415,5 +417,25 @@ img {
 .latest-container .view-button,
 .article-card .view-button {
   bottom: 40px;
+}
+
+.text-wrapper {
+  overflow: hidden;
+}
+
+.text-column.expanded .text-wrapper {
+  overflow: visible;
+  max-height: none;
+}
+
+.expand-toggle {
+  cursor: pointer;
+  color: var(--theme-2);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.articles-container h2 {
+  text-align: center;
 }
 </style>
