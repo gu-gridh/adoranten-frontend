@@ -25,8 +25,7 @@ async function fetchFormData() {
     const [contactLabel = 'Contact us', submitLabel = 'Submit an article'] =
       (choicesField?.choices || '').split(/\r?\n/)
 
-    ctaText.value =
-      formType.value === 'submit' ? submitLabel : contactLabel
+    ctaText.value = formType.value === 'submit' ? submitLabel : contactLabel
 
     thankYouText.value = page.thank_you_text.replace(/<[^>]+>/g, '').trim()
   } catch (err) {

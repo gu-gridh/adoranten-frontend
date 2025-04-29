@@ -1,6 +1,7 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue'
 import X from '/src/assets/close.svg'
+import issueIcon from '/src/assets/issue.png'
 
 defineProps({
   show: Boolean,
@@ -13,13 +14,17 @@ const emit = defineEmits(['close'])
   <div v-if="show" class="overlay">
     <div class="overlay-content">
         <img :src="X" alt="Close" class="close-icon" @click="emit('close')" />
-      <h2>Issues</h2>
+      <div class="title">Issues</div>
       <div class="issues-list">
-        <div v-for="issue in issues" :key="issue.id">
-          <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
-            Issue {{ issue.issue_year }}
-          </router-link>
-        </div>
+        <router-link
+          v-for="issue in issues"
+          :key="issue.id"
+          :to="{ name: 'Issue', params: { id: issue.id } }"
+          class="issue-item"
+        >
+          <img :src="issueIcon" alt="Issue Icon" class="issue-icon" />
+          Adoranten&nbsp;{{ issue.issue_year }}
+        </router-link>
       </div>
     </div>
   </div>
@@ -46,13 +51,14 @@ const emit = defineEmits(['close'])
   width: 30px;
   height: auto;
   cursor: pointer;
+  transition: transform 0.25s ease-in-out;
 }
 
 .overlay-content {
   background: white;
   padding: 20px;
   border-radius: 10px;
-  width: 40%;
+  width: 30%;
   min-height: 50vh;
   text-align: center;
   position: relative;
@@ -61,5 +67,46 @@ const emit = defineEmits(['close'])
 .close-btn > img {
   width: 20px;
   height: auto;
+}
+
+.close-icon:hover {
+  transform: scale(1.1);
+}
+
+.title {
+  font-size: 28px;
+}
+
+.issues-list {
+  margin-top: 1rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.issue-item {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.2s ease-in-out;
+  text-align: center;
+  justify-content: center; 
+  position: relative;
+}
+
+.issue-icon {
+  width: 24px;
+  height: auto;
+  position: absolute; 
+  left: 0;
+}
+
+.issue-item:hover {
+  background: #f0f0f0;
 }
 </style>
