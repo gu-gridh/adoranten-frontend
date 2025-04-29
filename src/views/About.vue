@@ -2,7 +2,10 @@
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import backButton from '/src/assets/back-button.svg'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const route = useRoute()
 const toast = useToast()
 
@@ -13,6 +16,14 @@ const form = reactive({ firstName: '', email: '', message: '' })
 const formType = ref('contact') //contact or submit
 const ctaText = ref('Send')
 const thankYouText = ref('Thanks for your submission.')
+
+function goBack() {
+  if (window.history.length > 2) {
+    history.back()
+  } else {
+    router.push({name: 'Home' })
+  }
+}
 
 async function fetchFormData() {
   try {
@@ -70,6 +81,11 @@ async function handleSubmit() {
 </script>
 
 <template>
+    <div class="header-wrapper">
+      <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
+      <p v-html="description"></p>
+    </div>
+
   <div class="contact-form">
     <h2>{{ formType === 'submit' ? 'Submit' : 'Contact' }}</h2>
 
@@ -144,5 +160,20 @@ button {
 
 button:hover {
   background: var(--theme-3);
+}
+
+.header-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button {
+  position: absolute;
+  left: 25px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
 }
 </style>

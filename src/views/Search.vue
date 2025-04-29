@@ -4,7 +4,9 @@ import articleIcon from '/src/assets/article.png'
 import issueIcon from '/src/assets/issue.png'
 import { adorantenStore } from '/src/stores/store.js'
 import backButton from '/src/assets/back-button.svg'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const description = ref('Loading...')
 const searchTerm = ref('')
 const allArticles = ref([]) // holds the full list of articles fetched on mount
@@ -15,7 +17,11 @@ const useLazyLoading = ref(false) // toggle between eager and lazy loading imple
 const store = adorantenStore()
 
 function goBack() {
-  history.back()
+  if (window.history.length > 2) {
+    history.back()
+  } else {
+    router.push({name: 'Home' })
+  }
 }
 
 // function for processing articles to match the structure needed for display
