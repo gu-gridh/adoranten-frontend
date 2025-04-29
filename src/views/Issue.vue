@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import linkArrow from '/src/assets/link-arrow.png'
 import rightArrow from '/src/assets/right-arrow.png'
 import downArrow from '/src/assets/down-arrow.png'
 import backButton from '/src/assets/back-button.svg'
+import infoIcon from '/src/assets/info.svg'
+import closeIcon from '/src/assets/close.svg'
 import { adorantenStore } from "/src/stores/store.js";
 
 // access the current route
@@ -19,6 +21,9 @@ const expandedArticles = ref({})
 const TRUNCATE_LIMIT = 300
 const store = adorantenStore();
 const showCitationBox = ref(null)
+const showIssueDescriptionOverlay = ref(false)
+const hasDescription  = computed( //check if the issue has a description
+() => issue.value?.description && issue.value.description.trim() !== '')
 
 function downloadCitation(articleTitle, format) {
   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
@@ -77,6 +82,14 @@ function setKeyword(tag) {
   router.push({ name: 'Search' })
 }
 
+function showIssueDescription() {
+  showIssueDescriptionOverlay.value = true
+}
+
+function toggleOverlay() {
+  showIssueDescriptionOverlay.value = !showIssueDescriptionOverlay.value
+}
+
 onMounted(async () => {
   //fetch issue article data
   try {
@@ -121,7 +134,7 @@ onMounted(async () => {
   <div>
     <div class="header-wrapper">
       <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
-      <h2>{{ issue.title }}</h2>
+      <h2>{{ issue.title }} <img v-if="hasDescription" :src="infoIcon" alt="Info" class="info-icon" @click="showIssueDescription" /></h2>
     </div>
     <h3 id="issue-button">
       <a v-if="issue.pdf_file" :href="issue.pdf_file" target="_blank">
@@ -197,10 +210,57 @@ onMounted(async () => {
         </li>
       </ul>
     </div>
+    <div v-if="showIssueDescriptionOverlay" class="overlay">
+      <div class="overlay-content">
+        <img :src="closeIcon" alt="Close" class="close-icon" @click="toggleOverlay" />
+        <h2>Issue Description</h2>
+        <div>
+          <div v-if="issue.description" v-html="issue.description"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #707070e8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.overlay-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 30%;
+  min-height: 50vh;
+  text-align: left;
+  position: relative;
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.25s ease-in-out;
+}
+
+.close-icon:hover {
+  transform: scale(1.1);
+}
+
+
 .image-container {
   position: relative;
   width: 100%;

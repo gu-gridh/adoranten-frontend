@@ -64,11 +64,6 @@ const emit = defineEmits(['close'])
   position: relative;
 }
 
-.close-btn > img {
-  width: 20px;
-  height: auto;
-}
-
 .close-icon:hover {
   transform: scale(1.1);
 }
