@@ -16,6 +16,15 @@ const latestIssue = ref(null)
 const showOverlay = ref(false)
 const router = useRouter();
 
+const coverImg = ref(null)
+const coverHeight = ref(0)
+
+const onImageLoad = () => {
+  if (coverImg.value) {
+    coverHeight.value = coverImg.value.clientHeight
+  }
+}
+
 const carouselConfig = {
   itemsToShow: 2.5,
   wrapAround: true,
@@ -136,11 +145,17 @@ onMounted(async () => {
 
     <h2 v-if="latestIssue" class="latest-title">Latest Issue: {{ latestIssue.title }}</h2>
     <div v-if="latestIssue" class="latest-container">
-      <img ref="coverImg" :src="latestIssue.image.file" :alt="latestIssue.image.title" class="cover-image"
-        @load="onImageLoad" @click="navigateToIssue(latestIssue)" />
+      <div class="image-container" @click="navigateToIssue(latestIssue)">
+        <img ref="coverImg" :src="latestIssue.image.file" :alt="latestIssue.image.title" class="cover-image"
+          @load="onImageLoad" />
+        <button class="view-button">
+          <span>View&nbsp;Issue</span>
+          <img :src="linkArrow" alt="Arrow Icon" class="arrow-icon" />
+        </button>
+      </div>
 
-      <div class="text-column">
-        <p v-html="latestIssue.description" </p>
+      <div class="text-column" :style="{ maxHeight: coverHeight + 'px' }">
+        <p v-html="latestIssue.description"></p>
       </div>
     </div>
 
@@ -150,8 +165,14 @@ onMounted(async () => {
       <div class="articles-grid">
         <div v-for="article in articles" :key="article.id" class="article-card" @click="navigateToArticle(article)"
           :style="article.issueId ? 'cursor: pointer' : ''">
-          <img v-if="article.image && article.image.file" :src="article.image.file" :alt="article.title"
-            class="article-image" />
+          <div class="image-container">
+            <img v-if="article.image && article.image.file" :src="article.image.file" :alt="article.title"
+              class="article-image" />
+            <button class="view-button">
+              <span>View&nbsp;Article</span>
+              <img :src="linkArrow" alt="Arrow Icon" class="arrow-icon" />
+            </button>
+          </div>
           <h3 class="article-title">{{ article.title }}</h3>
         </div>
       </div>
@@ -172,11 +193,15 @@ onMounted(async () => {
   height: auto;
   object-fit: contain;
   cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
 }
 
 .text-column {
-  overflow-y: hidden;
-  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 12;
 }
 
 .cover-image {
@@ -239,6 +264,12 @@ onMounted(async () => {
 .article-card {
   min-width: 200px;
   text-align: left;
+}
+
+.articles-container .image-container img {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .article-card:hover .article-image {
@@ -354,8 +385,35 @@ img {
 }
 
 @media screen and (max-width: 768px) {
+  .latest-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .text-column {
+    margin-left: 0;
+    margin-top: 1rem;
+    width: 90%;
+    text-align: center;
+  }
+
   #home-container>div.carousel-container>section>ol {
     display: none;
   }
+}
+
+.latest-container .image-container,
+.article-card .image-container {
+  position: relative;
+}
+
+.article-card:hover .view-button,
+.latest-container .image-container:hover .view-button {
+  opacity: 1;
+}
+
+.latest-container .view-button,
+.article-card .view-button {
+  bottom: 40px;
 }
 </style>
