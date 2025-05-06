@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Issue from '../views/Issue.vue'
+import Search from '../views/Search.vue'
+import About from '../views/About.vue'
+import Accessibility from '../views/Accessibility.vue'
 
 const routes = [
   {
@@ -13,11 +16,31 @@ const routes = [
     name: 'Issue',
     component: Issue,
     props: true
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: Search
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: About
+  },
+  {
+    path: '/accessibility',
+    name: 'accessibility',
+    component: Accessibility
+  },
+  {
+    path: '/submit',
+    name: 'Submit',
+    component: About
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/adoranten/'),
   routes
 })
 
