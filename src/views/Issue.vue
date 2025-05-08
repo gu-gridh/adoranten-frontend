@@ -245,10 +245,13 @@ onMounted(async () => {
   background: white;
   padding: 20px;
   border-radius: 10px;
-  width: 30%;
   min-height: 50vh;
   text-align: left;
   position: relative;
+}
+
+.overlay-content h2 {
+  text-align: center;
 }
 
 .close-icon {
@@ -494,6 +497,18 @@ ul {
   width: 30px;
   height: 30px;
   cursor: pointer;
+}
+
+.info-icon {
+  display: inline-block;
+  height: 1em;
+  vertical-align: middle;
+  margin-left: .35em;
+  cursor: pointer;
+}
+
+.info-icon:hover {
+  transform: scale(1.1);
 }
 
 @media (max-width: 1024px) {
