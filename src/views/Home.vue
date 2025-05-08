@@ -167,7 +167,7 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
       </div>
 
       <div class="text-column" :class="{ expanded: expandedLatest }">
-        <div class="text-wrapper" ref="textWrapper" :style="expandedLatest ? {} : { maxHeight: coverHeight + 'px' }">
+        <div class="text-wrapper" ref="textWrapper" :style="expandedLatest ? {} : { maxHeight: (coverHeight - 25) + 'px' }">
           <p v-html="latestIssue.description"></p>
         </div>
 
@@ -263,7 +263,8 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 }
 
 .article-card {
-  min-width: 200px;
+  width: 30%;
+  flex-shrink: 0;
   text-align: left;
 }
 
