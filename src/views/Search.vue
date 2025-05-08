@@ -278,12 +278,4 @@ watch(() => store.keyword, async (newKeyword) => {
   align-items: center;
   justify-content: center;
 }
-
-.back-button {
-  position: absolute;
-  left: 25px;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-}
 </style>
