@@ -76,6 +76,12 @@ const emit = defineEmits(['close'])
   margin-top: 1rem;
   max-height: 60vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.issues-list::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
 }
 
 .issue-item {
