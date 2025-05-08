@@ -403,6 +403,10 @@ img {
   #home-container>div.carousel-container>section>ol {
     display: none;
   }
+
+  .article-card {
+    width: 100%;
+  }
 }
 
 .latest-container .image-container,
