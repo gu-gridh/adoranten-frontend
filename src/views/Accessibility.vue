@@ -4,13 +4,11 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-function goBack() {
-  if (window.history.length > 2) {
-    history.back()
-  } else {
-    router.push({name: 'Home' })
-  }
+function goBack () {
+  const { back } = router.options.history.state || {}
+  back ? router.back() : router.push({ name: 'Home' })
 }
+
 </script>
 <template>
     <div class="header-wrapper">

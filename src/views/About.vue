@@ -17,12 +17,9 @@ const formType = ref('contact') //contact or submit
 const ctaText = ref('Send')
 const thankYouText = ref('Thanks for your submission.')
 
-function goBack() {
-  if (window.history.length > 2) {
-    history.back()
-  } else {
-    router.push({name: 'Home' })
-  }
+function goBack () {
+  const { back } = router.options.history.state || {}
+  back ? router.back() : router.push({ name: 'Home' })
 }
 
 async function fetchFormData() {

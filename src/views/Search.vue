@@ -16,12 +16,9 @@ const useLazyLoading = ref(false) // toggle between eager and lazy loading imple
 
 const store = adorantenStore()
 
-function goBack() {
-  if (window.history.length > 2) {
-    history.back()
-  } else {
-    router.push({name: 'Home' })
-  }
+function goBack () {
+  const { back } = router.options.history.state || {}
+  back ? router.back() : router.push({ name: 'Home' })
 }
 
 // function for processing articles to match the structure needed for display

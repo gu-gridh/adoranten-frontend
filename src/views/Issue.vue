@@ -47,8 +47,9 @@ function toggleCitation(articleId) {
   }
 }
 
-function goBack() { //back one step in history
-  history.back()
+function goBack () {
+  const { back } = router.options.history.state || {}
+  back ? router.back() : router.push({ name: 'Home' })
 }
 
 function toggleDownload(articleId) {
