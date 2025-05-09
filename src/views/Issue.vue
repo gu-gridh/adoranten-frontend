@@ -214,7 +214,6 @@ onMounted(async () => {
     <div v-if="showIssueDescriptionOverlay" class="overlay">
       <div class="overlay-content">
         <img :src="closeIcon" alt="Close" class="close-icon" @click="toggleOverlay" />
-        <h2>Issue Description</h2>
         <div>
           <div v-if="issue.description" v-html="issue.description"></div>
         </div>
@@ -293,6 +292,10 @@ onMounted(async () => {
   gap: 4px;
   z-index: 1;
   font-size: 1rem;
+}
+
+.pdf-button:hover {
+  background-color: var(--theme-3);
 }
 
 .pdf-button .arrow-icon {
@@ -402,15 +405,14 @@ ul {
   cursor: pointer;
 }
 
-.keyword-tag:hover {
-  background: #fff;
-  color: #000;
-}
-
 .download-dropdown {
   position: relative;
   display: inline-flex;
   align-items: center;
+}
+
+button.download-main-button:hover, .keyword-tag:hover  {
+  background-color: var(--theme-3);
 }
 
 .download-main-button {
