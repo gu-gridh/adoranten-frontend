@@ -22,7 +22,7 @@ const emit = defineEmits(['close'])
           class="issue-item"
         >
           <img :src="issueIcon" alt="Issue Icon" class="issue-icon" />
-          Adoranten&nbsp;{{ issue.issue_year }}
+            <span class="issue-title">Adoranten&nbsp;{{ issue.issue_year }}</span>
         </router-link>
       </div>
     </div>
@@ -57,7 +57,7 @@ const emit = defineEmits(['close'])
   background: white;
   padding: 20px;
   border-radius: 10px;
-  width: 30%;
+  width: 13%;
   min-height: 50vh;
   text-align: center;
   position: relative;
@@ -80,7 +80,6 @@ const emit = defineEmits(['close'])
 }
 
 .issue-item {
-  font-size: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -90,19 +89,21 @@ const emit = defineEmits(['close'])
   color: inherit;
   text-decoration: none;
   transition: background 0.2s ease-in-out;
-  text-align: center;
-  justify-content: center; 
+  justify-content: flex-start; 
   position: relative;
 }
 
 .issue-icon {
   width: 24px;
   height: auto;
-  position: absolute; 
-  left: 0;
 }
 
 .issue-item:hover {
   background: #f0f0f0;
+}
+
+.issue-title {
+  color: #646cff;
+  font-size: 1.1rem;
 }
 </style>

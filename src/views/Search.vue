@@ -182,7 +182,7 @@ watch(() => store.keyword, async newKeyword => {
           {{ item.title }}
         </router-link>
         <!-- For articles -->
-        <router-link v-else-if="item.issueId" :to="{
+        <router-link v-else-if="item.issueId" class="search-link" :to="{
           name: 'Issue',
           params: { id: item.issueId },
           hash: '#article-' + item.id
@@ -249,5 +249,13 @@ watch(() => store.keyword, async newKeyword => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.search-link {
+  display: flex;
+  align-items: flex-start;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
 }
 </style>
