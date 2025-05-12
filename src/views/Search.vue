@@ -78,9 +78,6 @@ onMounted(async () => {
         ...articles.map(mapArticle)
       ]
 
-      //combine issues and processed articles
-      allArticles.value = [...allArticles.value, ...articlesData.items.map(mapArticle)]
-
       const end = performance.now();
       console.log(`Eager load initial rendering took ${(end - start).toFixed(2)} ms`);
     } catch (error) {
@@ -198,7 +195,8 @@ watch(() => store.keyword, async newKeyword => {
 <style scoped>
 .search-container {
   position: relative;
-  width: 50%;
+  width: 90%;
+  max-width: 600px;
   margin: 0 auto;
   box-sizing: border-box;
 }

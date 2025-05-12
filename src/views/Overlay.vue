@@ -51,13 +51,15 @@ const emit = defineEmits(['close'])
   height: auto;
   cursor: pointer;
   transition: transform 0.25s ease-in-out;
+  z-index: 10;
 }
 
 .overlay-content {
   background: white;
-  padding: 20px;
+  padding: 0;
   border-radius: 10px;
-  width: 13%;
+  width: 200px;
+  max-width: 400px;
   min-height: 50vh;
   text-align: center;
   position: relative;
@@ -69,6 +71,7 @@ const emit = defineEmits(['close'])
 
 .issues-list {
   margin-top: 1rem;
+  padding: 20px 0; 
   max-height: 60vh;
   overflow-y: auto;
   scrollbar-width: none;
@@ -84,7 +87,7 @@ const emit = defineEmits(['close'])
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 0.5rem 0;
+  padding: 0.5rem 20px;
   border-bottom: 1px solid #e0e0e0;
   color: inherit;
   text-decoration: none;
@@ -99,7 +102,7 @@ const emit = defineEmits(['close'])
 }
 
 .issue-item:hover {
-  background: #f0f0f0;
+  background: #e2e2e2;
 }
 
 .issue-title {
