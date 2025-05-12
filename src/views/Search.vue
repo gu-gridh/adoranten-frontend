@@ -16,47 +16,37 @@ const useLazyLoading = ref(false) // toggle between eager and lazy loading imple
 
 const store = adorantenStore()
 
-function goBack () {
+function goBack() {
   const { back } = router.options.history.state || {}
   back ? router.back() : router.push({ name: 'Home' })
 }
 
-// function for processing articles to match the structure needed for display
-const processArticles = (articlesData, allArticles) => {
-  return articlesData.items.map(article => {
-    const articleUrl = article.meta?.html_url || '';
-    let issueId = null;
+const mapArticle = a => ({
+  id: a.id,
+  title: a.title,
+  isArticle: true,
+  issueId: a.issue_id,
+})
 
-    // try to find issue ID by matching with known issues
-    if (articleUrl) {
-      // extract issue slug from article URL
-      const urlParts = articleUrl.split('/');
-      const publicationsIndex = urlParts.indexOf('publications');
+async function fetchAll(type, fields = '') { //loops through all pages using offset
+  const limit = 200
+  let offset = 0
+  const out = []
 
-      if (publicationsIndex !== -1 && urlParts.length > publicationsIndex + 1) {
-        const issueSlug = urlParts[publicationsIndex + 1];
+  while (true) {
+    const url = `${baseURL}${type}&limit=${limit}&offset=${offset}${fields}`
+    console.log(url)
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`fetch failed`)
 
-        // look for matching issue by slug
-        const matchingIssue = allArticles.find(
-          item => !item.isArticle && item.meta.slug === issueSlug
-        );
+    const json = await res.json()
+    out.push(...json.items)
 
-        if (matchingIssue) {
-          issueId = matchingIssue.id;
-        }
-      }
-    }
-
-    return {
-      id: article.id,
-      title: article.title,
-      isArticle: true,
-      meta: article.meta,
-      articleUrl: articleUrl,
-      issueId: issueId
-    };
-  });
-};
+    if (json.items.length < limit) break
+    offset += limit
+  }
+  return out
+}
 
 onMounted(async () => {
   const start = performance.now()
@@ -78,28 +68,18 @@ onMounted(async () => {
   if (!useLazyLoading.value) {
     //fetch all issues
     try {
-      const [issuesResponse, articlesResponse] = await Promise.all([
-        fetch(`${baseURL}journal.IssuePage&limit=200`),
-        fetch(`${baseURL}journal.ArticlePage&limit=200`)
-      ]);
+      const [issues, articles] = await Promise.all([
+        fetchAll('journal.IssuePage'),
+        fetchAll('journal.ArticlePage', '&fields=issue_id')
+      ])
 
-      if (!issuesResponse.ok || !articlesResponse.ok) {
-        throw new Error('network response was not ok');
-      }
-
-      const [issuesData, articlesData] = await Promise.all([
-        issuesResponse.json(),
-        articlesResponse.json()
-      ]);
-
-      //store issues in allArticles
-      allArticles.value = issuesData.items || [];
-
-      //process articles
-      const processedArticles = processArticles(articlesData, allArticles.value);
+      allArticles.value = [
+        ...issues,
+        ...articles.map(mapArticle)
+      ]
 
       //combine issues and processed articles
-      allArticles.value = [...allArticles.value, ...processedArticles];
+      allArticles.value = [...allArticles.value, ...articlesData.items.map(mapArticle)]
 
       const end = performance.now();
       console.log(`Eager load initial rendering took ${(end - start).toFixed(2)} ms`);
@@ -128,26 +108,19 @@ watch(searchTerm, async (newValue) => {
     }
 
     try {
-      // Fetch issues
-      const issuesResponse = await fetch(`${baseURL}journal.IssuePage&search=${encodeURIComponent(newValue)}`)
-      console.log(issuesResponse);
+      const query = encodeURIComponent(newValue)
+      const searchIssues = fetchAll(`journal.IssuePage&search=${query}`)
+      const searchArticles = fetchAll(`journal.ArticlePage&fields=issue_id&search=${query}`)
 
-      const issuesData = await issuesResponse.json()
-
-      // Fetch articles
-      const articlesResponse = await fetch(`${baseURL}journal.ArticlePage&search=${encodeURIComponent(newValue)}`)
-      const articlesData = await articlesResponse.json()
-
-      // process articles to match the structure needed for display
-      const processedArticles = processArticles(articlesData, allArticles.value)
-
-      // Combine results
-      results.value = [...issuesData.items, ...processedArticles]
+      results.value = [
+        ...await searchIssues,
+        ... (await searchArticles).map(mapArticle)
+      ]
 
       const end = performance.now()
       console.log(`Lazy load search took ${(end - start).toFixed(2)} ms`)
     } catch (error) {
-      console.error('Error in lazy loading search:', error)
+      console.error(error)
       results.value = []
     }
   } else {
@@ -167,33 +140,34 @@ watch(searchTerm, async (newValue) => {
   }
 })
 
-watch(() => store.keyword, async (newKeyword) => {
-  if (newKeyword && newKeyword !== 'keyword') {
-    searchTerm.value = newKeyword
-
-    const tagURL = `https://shfa.dh.gu.se/wagtail/api/v2/articles/?tag=${encodeURIComponent(newKeyword)}`
-    try {
-      const response = await fetch(tagURL)
-      if (!response.ok) {
-        throw new Error('bad connection')
-      }
-      const data = await response.json()
-      results.value = Array.isArray(data) ? data : (data.items || []);
-      console.log(results.value);
-    } catch (error) {
-      console.error(error)
-    }
-  } else {
+watch(() => store.keyword, async newKeyword => {
+  if (!newKeyword || newKeyword === 'keyword') {
     searchTerm.value = ''
     results.value = []
+    return
   }
-},  { immediate: true })
+  searchTerm.value = newKeyword
+  const tagURL = `https://shfa.dh.gu.se/wagtail/api/v2/articles/?tag=${encodeURIComponent(newKeyword)}`
+  try {
+    const response = await fetch(tagURL)
+    if (!response.ok) throw new Error('bad connection')
+
+    const json = await response.json()
+    const raw = Array.isArray(json) ? json : (json.items || [])
+
+    results.value = raw.map(mapArticle)
+
+  } catch (err) {
+    console.error(err)
+    results.value = []
+  }
+}, { immediate: true })
 </script>
 
 <template>
   <div class="header-wrapper">
-      <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
-      <p v-html="description"></p>
+    <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
+    <p v-html="description"></p>
   </div>
 
   <div class="search-container">
@@ -209,14 +183,15 @@ watch(() => store.keyword, async (newKeyword) => {
         </router-link>
         <!-- For articles -->
         <router-link v-else-if="item.issueId" :to="{
-            name: 'Issue',
-            params: { id: item.issueId },
-            hash: '#article-' + item.id
-            }">
+          name: 'Issue',
+          params: { id: item.issueId },
+          hash: '#article-' + item.id
+        }">
           {{ item.title }} (Article)
         </router-link>
       </div>
     </div>
+
   </div>
 </template>
 

@@ -14,7 +14,6 @@ const emit = defineEmits(['close'])
   <div v-if="show" class="overlay">
     <div class="overlay-content">
         <img :src="X" alt="Close" class="close-icon" @click="emit('close')" />
-      <div class="title">Issues</div>
       <div class="issues-list">
         <router-link
           v-for="issue in issues"
@@ -66,10 +65,6 @@ const emit = defineEmits(['close'])
 
 .close-icon:hover {
   transform: scale(1.1);
-}
-
-.title {
-  font-size: 28px;
 }
 
 .issues-list {
