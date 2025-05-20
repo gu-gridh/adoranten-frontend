@@ -30,7 +30,7 @@ const hasDescription = computed( //check if the issue has a description
 function downloadCitation(articleTitle, format) {
   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
   const fileName = `${sanitizedTitle}.${format}`
-  const citationText = `citation for "${articleTitle}" in a .${format} file.`
+  const citationText = `${articleTitle}"`
   const blob = new Blob([citationText], { type: 'text/plain' })  //blob is a file-like object of raw data
 
   //create a temporary link to trigger the download because blobs can't be downloaded directly
