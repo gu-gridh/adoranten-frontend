@@ -16,6 +16,7 @@ const form = reactive({ firstName: '', email: '', message: '' })
 const formType = ref('contact') //contact or submit
 const ctaText = ref('Send')
 const thankYouText = ref('Thanks for your submission.')
+const description = ref('')
 
 function goBack () {
   const { back } = router.options.history.state || {}
@@ -36,6 +37,7 @@ async function fetchFormData() {
     ctaText.value = formType.value === 'submit' ? submitLabel : contactLabel
 
     thankYouText.value = page.thank_you_text.replace(/<[^>]+>/g, '').trim()
+    description.value = page.intro || '' 
   } catch (err) {
     console.error(err)
   }
@@ -113,7 +115,14 @@ async function handleSubmit() {
 .contact-form {
   max-width: 400px;
   margin: 40px auto;
-  padding: 15px;
+  margin-top: 0px;
+}
+
+@media (max-width: 600px) {
+  .contact-form {
+    max-width: 90%;
+    padding: 0 10px;
+  }
 }
 
 .form-group-name {

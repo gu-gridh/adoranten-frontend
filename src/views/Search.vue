@@ -35,7 +35,7 @@ async function fetchAll(type, fields = '') { //loops through all pages using off
 
   while (true) {
     const url = `${baseURL}${type}&limit=${limit}&offset=${offset}${fields}`
-    console.log(url)
+    // console.log(url)
     const res = await fetch(url)
     if (!res.ok) throw new Error(`fetch failed`)
 
@@ -79,13 +79,13 @@ onMounted(async () => {
       ]
 
       const end = performance.now();
-      console.log(`Eager load initial rendering took ${(end - start).toFixed(2)} ms`);
+      // console.log(`Eager load initial rendering took ${(end - start).toFixed(2)} ms`);
     } catch (error) {
       console.error(error)
     }
   } else {
     const end = performance.now()
-    console.log(`Lazy load initial rendering took ${(end - start).toFixed(2)} ms`)
+    // console.log(`Lazy load initial rendering took ${(end - start).toFixed(2)} ms`)
   }
 })
 
@@ -115,7 +115,7 @@ watch(searchTerm, async (newValue) => {
       ]
 
       const end = performance.now()
-      console.log(`Lazy load search took ${(end - start).toFixed(2)} ms`)
+      // console.log(`Lazy load search took ${(end - start).toFixed(2)} ms`)
     } catch (error) {
       console.error(error)
       results.value = []
@@ -132,7 +132,7 @@ watch(searchTerm, async (newValue) => {
         return item.title.toLowerCase().includes(newValue.toLowerCase())
       })
       const end = performance.now()
-      console.log(`Eager load filtering took ${(end - start).toFixed(2)} ms`)
+      // console.log(`Eager load filtering took ${(end - start).toFixed(2)} ms`)
     }
   }
 })

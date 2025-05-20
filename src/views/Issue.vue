@@ -384,7 +384,7 @@ ul {
   cursor: pointer;
   color: #fff;
   font-weight: bold;
-  margin: 5px 0;
+  margin-bottom: 12px;
 }
 
 .bottom-bar {
