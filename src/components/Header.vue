@@ -49,11 +49,11 @@ const toggleMenu = () => {
             @click="navigateTo('/submit')">
             Submit
           </li>
-          <li 
+          <!-- <li 
             :class="{ active: route.path === '/accessibility' }" 
             @click="navigateTo('/accessibility')">
             Accessibility
-          </li>
+          </li> -->
           <li 
             :class="{ active: route.path === '/about' }" 
             @click="navigateTo('/about')">
