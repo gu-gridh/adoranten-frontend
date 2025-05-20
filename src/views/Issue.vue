@@ -246,8 +246,16 @@ onMounted(async () => {
   padding: 20px;
   border-radius: 10px;
   min-height: 50vh;
+  max-height: 80vh;
+  overflow-y: auto; 
   text-align: left;
   position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none; 
+}
+
+.overlay-content::-webkit-scrollbar {
+  display: none;
 }
 
 .overlay-content h2 {
