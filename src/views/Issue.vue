@@ -22,8 +22,8 @@ const TRUNCATE_LIMIT = 300
 const store = adorantenStore();
 const showCitationBox = ref(null)
 const showIssueDescriptionOverlay = ref(false)
-const hasDescription  = computed( //check if the issue has a description
-() => issue.value?.description && issue.value.description.trim() !== '')
+const hasDescription = computed( //check if the issue has a description
+  () => issue.value?.description && issue.value.description.trim() !== '')
 
 function downloadCitation(articleTitle, format) {
   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
@@ -47,7 +47,7 @@ function toggleCitation(articleId) {
   }
 }
 
-function goBack () {
+function goBack() {
   const { back } = router.options.history.state || {}
   back ? router.back() : router.push({ name: 'Home' })
 }
@@ -135,7 +135,8 @@ onMounted(async () => {
   <div>
     <div class="header-wrapper">
       <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
-      <h2>{{ issue.title }} <img v-if="hasDescription" :src="infoIcon" alt="Info" class="info-icon" @click="showIssueDescription" /></h2>
+      <h2>{{ issue.title }} <img v-if="hasDescription" :src="infoIcon" alt="Info" class="info-icon"
+          @click="showIssueDescription" /></h2>
     </div>
     <h3 id="issue-button">
       <a v-if="issue.pdf_file" :href="issue.pdf_file" target="_blank">
@@ -183,7 +184,8 @@ onMounted(async () => {
 
                 <div class="button-group">
                   <div class="download-dropdown">
-                    <button class="download-main-button" :class="{ 'disabled-button': !article.citation }" @click.stop="toggleDownload(article.id)">
+                    <button class="download-main-button" :class="{ 'disabled-button': !article.citation }"
+                      @click.stop="toggleDownload(article.id)">
                       <span>Download Citation</span>
                       <img :src="rightArrow" alt="Toggle Download Options" class="arrow-icon" />
                     </button>
@@ -193,7 +195,8 @@ onMounted(async () => {
                     </div>
                   </div>
 
-                  <button class="download-main-button" :class="{ 'disabled-button': !article.citation }" @click="toggleCitation(article.id)">
+                  <button class="download-main-button" :class="{ 'disabled-button': !article.citation }"
+                    @click="toggleCitation(article.id)">
                     <span>Copy Citation</span>
                     <img :src="downArrow" alt="Toggle Citation Box" class="arrow-icon" />
                   </button>
@@ -211,71 +214,115 @@ onMounted(async () => {
         </li>
       </ul>
     </div>
-    <div v-if="showIssueDescriptionOverlay" class="overlay">
-      <div class="overlay-content">
-        <img :src="closeIcon" alt="Close" class="close-icon" @click="toggleOverlay" />
-        <div>
-          <div v-if="issue.description" v-html="issue.description"></div>
-        </div>
+    <transition name="fade">
+      <div v-if="showIssueDescriptionOverlay" class="backdrop" @click.self="toggleOverlay">
+        <transition name="slide">
+          <aside class="desc-drawer">
+            <button class="drawer-close" @click="toggleOverlay" aria-label="Close">
+              <img :src="closeIcon" alt="" />
+            </button>
+            <div class="desc-scroll">
+              <div v-if="issue.description" v-html="issue.description"></div>
+              <p v-else>No description for this issue.</p>
+            </div>
+          </aside>
+        </transition>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
 <style scoped>
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0 0 0 /.45);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+}
+
+.desc-drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: clamp(260px, 75vw, 360px);
+  height: 100%;
+  background: #fff;
+  box-shadow: -4px 0 14px rgba(0, 0, 0, .2);
+  display: flex;
+  flex-direction: column;
+  padding-top: 56px;
+  overflow: hidden;
+}
+
+.desc-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 24px 32px;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+  text-align: left;
+}
+
+.desc-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.desc-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.desc-scroll::-webkit-scrollbar-thumb {
+  background: #ccc;
+}
+
+.drawer-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform .25s ease-in-out;
+}
+
+.drawer-close:hover {
+  transform: scale(1.1);
+}
+
+.drawer-close img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform .3s ease;
+}
+
 .disabled-button {
   pointer-events: none;
   opacity: 0.5;
 }
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #707070e8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.overlay-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  min-height: 50vh;
-  max-height: 80vh;
-  overflow-y: auto; 
-  text-align: left;
-  position: relative;
-  scrollbar-width: none;
-  -ms-overflow-style: none; 
-}
-
-.overlay-content::-webkit-scrollbar {
-  display: none;
-}
-
-.overlay-content h2 {
-  text-align: center;
-}
-
-.close-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: auto;
-  cursor: pointer;
-  transition: transform 0.25s ease-in-out;
-}
-
-.close-icon:hover {
-  transform: scale(1.1);
-}
-
 
 .image-container {
   position: relative;
@@ -425,7 +472,8 @@ ul {
   align-items: center;
 }
 
-button.download-main-button:hover, .keyword-tag:hover  {
+button.download-main-button:hover,
+.keyword-tag:hover {
   background-color: var(--theme-3);
 }
 
