@@ -1,19 +1,21 @@
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { adorantenStore } from "/src/stores/store.js";
+import loader from '/src/assets/loader.svg' 
 import linkArrow from '/src/assets/link-arrow.png'
 import rightArrow from '/src/assets/right-arrow.png'
 import downArrow from '/src/assets/down-arrow.png'
 import backButton from '/src/assets/back-button.svg'
 import infoIcon from '/src/assets/info.svg'
 import closeIcon from '/src/assets/close.svg'
-import { adorantenStore } from "/src/stores/store.js";
 
 // access the current route
 const route = useRoute()
 const router = useRouter()
 const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.'
 const expandedArticleId = ref(null)
+const loading = ref(true)
 const articles = ref([])
 const issue = ref([])
 const issueId = route.params.id
@@ -118,6 +120,8 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('error fetching issue full pdf:', error)
+  } finally {
+    loading.value = false 
   }
 
   //after data is loaded, scroll to hash if present
@@ -132,7 +136,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div v-if="loading" class="loader-wrapper">
+    <img :src="loader" alt="Loading…" class="loader" />
+  </div>
+  <div v-else>
     <div class="header-wrapper">
       <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
       <h2>{{ issue.title }} <img v-if="hasDescription" :src="infoIcon" alt="Info" class="info-icon"
@@ -578,5 +585,11 @@ button.download-main-button:hover,
   .article-list-item {
     width: 100%;
   }
+}
+
+.loader {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
 }
 </style>
