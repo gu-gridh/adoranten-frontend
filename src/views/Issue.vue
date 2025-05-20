@@ -403,10 +403,16 @@ ul {
 
 .tags-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .keyword-tag {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   background: grey;
   border-radius: 8px;
   padding: 3px 8px;
