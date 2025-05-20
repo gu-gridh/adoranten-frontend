@@ -250,16 +250,14 @@ onMounted(async () => {
 
 .desc-drawer {
   position: fixed;
-  right: 0;
-  top: 0;
+  inset: 0 0 0 auto;
   width: clamp(260px, 75vw, 360px);
-  height: 100%;
+  max-height: 100dvh;
   background: #fff;
-  box-shadow: -4px 0 14px rgba(0, 0, 0, .2);
+  box-shadow: -4px 0 14px rgba(0,0,0,.2);
   display: flex;
   flex-direction: column;
   padding-top: 56px;
-  overflow: hidden;
 }
 
 .desc-scroll {
@@ -467,7 +465,7 @@ ul {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: grey;
+  background: var(--theme-2);
   border-radius: 8px;
   padding: 3px 8px;
   cursor: pointer;
