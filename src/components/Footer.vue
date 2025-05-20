@@ -3,21 +3,21 @@
     <div id="developer-info">
       <div class="links-stack">
         <a class="site-link link"
-          href=""
+          href="https://github.com/gu-gridh/adoranten-frontend"
           target="_blank">GitHub
           repositories and development</a>
-        <a class="site-link link" href=""
+        <a class="site-link link" href="https://github.com/gu-gridh/adoranten"
           target="_blank">Database and API documentation</a>
       </div>
       <!-- <div class="links-stack border-style">
         <a class="site-link link" href=""
           target="_blank">Dataset documentation</a>
       </div> -->
-      <div class="links-stack border-style extra">
+      <!-- <div class="links-stack border-style extra">
         <a class="site-link link" href=""
           target="_blank">Project team</a>
         <a class="site-link link" href="" target="_blank">Feedback form</a>
-      </div>
+      </div> -->
     </div>
     <div class="partners">
       <a href="https://dh.gu.se/">

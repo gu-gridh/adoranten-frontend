@@ -20,7 +20,7 @@ const toggleMenu = () => {
 <template>
   <header class="header-tabs">
     <div class="header-container">
-      <div class="brand">
+      <div class="brand" @click="navigateTo('/')">
         <img :src="logo" alt="Logo" class="site-logo" />
         <span class="site-title">Adoranten</span>
       </div>
@@ -74,6 +74,7 @@ const toggleMenu = () => {
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
 }
 
 .header-container {
