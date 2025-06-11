@@ -10,7 +10,7 @@ import backButton from '/src/assets/back-button.svg'
 import infoIcon from '/src/assets/info.svg'
 import closeIcon from '/src/assets/close.svg'
 
-// access the current route
+//access the current route
 const route = useRoute()
 const router = useRouter()
 const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.'
@@ -419,8 +419,7 @@ ul {
 }
 
 .article-title {
-  min-height: 48px;
-  margin: 0 0 8px 0;
+  margin-bottom: 0px;
 }
 
 .article-description p {

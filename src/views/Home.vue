@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue'
 import 'vue3-carousel/carousel.css'
-import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
+import { adorantenStore } from "/src/stores/store.js";
+import { Carousel, Slide, Navigation } from 'vue3-carousel'
+import rightArrow from '/src/assets/right-arrow.png'
 import linkArrow from '/src/assets/link-arrow.png'
-import hamburger from '/src/assets/menu.png'
 import loader from '/src/assets/loader.svg'
 import Overlay from '/src/views/Overlay.vue'
 import { useRouter } from 'vue-router'
@@ -22,6 +23,8 @@ const coverHeight = ref(0)
 const expandedLatest = ref(false)
 const showExpandToggle = ref(false)
 const textWrapper = ref(null)
+const viewMode = ref('carousel')
+const store = adorantenStore();
 
 const onImageLoad = () => {
   if (coverImg.value) {
@@ -67,14 +70,17 @@ const navigateToIssue = (article) => {
   }
 }
 
+function setKeyword(tag) {
+  store.keyword = tag
+  router.push({ name: 'Search' })
+}
+
 onMounted(async () => {
   try {
     loading.value = true;
-    //fetch both home page and issues data
     const responseHome = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=home.HomePage&fields=*')
     const dataHome = await responseHome.json()
 
-    //set description and issues and latest issue
     if (dataHome.items && dataHome.items.length > 0) {
       const homeItem = dataHome.items[0]
       description.value = homeItem.description
@@ -91,22 +97,35 @@ onMounted(async () => {
     } else {
       description.value = 'No home page content found'
     }
-  } catch (error) {
-    console.error(error)
-    description.value = 'Error loading home page content'
-  }
 
-  //fetch issues data
-  try {
-    const responseIssues = await fetch('https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&fields=*')
-    const dataIssues = await responseIssues.json()
-    if (dataIssues.items && dataIssues.items.length > 0) {
-      issues.value = dataIssues.items
-    } else {
-      issues.value = []
+    //fetch all issues
+    const fetchAllIssues = async () => {
+      const allIssues = []
+      const limit = 25
+      let offset = 0
+      let totalCount = Infinity
+
+      while (offset < totalCount) {
+        const res = await fetch(`https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.IssuePage&fields=*&limit=${limit}&offset=${offset}`)
+        const data = await res.json()
+
+        if (data.items && data.items.length > 0) {
+          allIssues.push(...data.items)
+          totalCount = data.meta.total_count
+          offset += data.items.length
+        } else {
+          break
+        }
+      }
+      return allIssues
     }
+
+    issues.value = await fetchAllIssues()
+
   } catch (error) {
     console.error(error)
+    description.value = 'error loading home page or issues'
+    issues.value = []
   } finally {
     loading.value = false
   }
@@ -125,16 +144,17 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 
     <!-- Render the carousel -->
     <div v-if="issues.length" class="carousel-container">
-      <button class="toggle-overlay-btn" @click="toggleOverlay">
-        <img :src="hamburger" alt="Menu" class="hamburger-icon" />
-      </button>
-      <h2>Issues</h2>
-      <Carousel  v-bind="carouselConfig">
+      <h2 style="margin-bottom: 5px; margin-top: 0px">Issues</h2>
+      <div class="view-toggle-buttons" style="margin-bottom: 10px;">
+        <button class="standard-button" @click="toggleOverlay">Show as a list</button>
+      </div>
+      <Carousel v-if="viewMode === 'carousel'" v-bind="carouselConfig">
+
         <Slide v-for="issue in issues" :key="issue.id">
           <div class="carousel__item">
             <div class="image-container">
               <img v-if="issue.image && issue.image.meta && issue.image.meta.download_url"
-              :src="issue.image.meta.download_url" alt="Issue Cover" />
+                :src="issue.image.meta.download_url" alt="Issue Cover" />
               <router-link :to="{ name: 'Issue', params: { id: issue.id } }">
                 <button class="view-button">
                   <span>View Issue</span>
@@ -147,7 +167,6 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
         </Slide>
         <template #addons>
           <Navigation />
-          <Pagination />
         </template>
       </Carousel>
     </div>
@@ -167,7 +186,8 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
       </div>
 
       <div class="text-column" :class="{ expanded: expandedLatest }">
-        <div class="text-wrapper" ref="textWrapper" :style="expandedLatest ? {} : { maxHeight: (coverHeight - 25) + 'px' }">
+        <div class="text-wrapper" ref="textWrapper"
+          :style="expandedLatest ? {} : { maxHeight: (coverHeight - 25) + 'px' }">
           <p v-html="latestIssue.description"></p>
         </div>
 
@@ -179,20 +199,25 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
     </div>
 
     <!-- Articles Display -->
-    <div v-if="articles.length" class="articles-container">
-      <h2>Selected Articles</h2>
-      <div class="articles-grid">
-        <div v-for="article in articles" :key="article.id" class="article-card" @click="navigateToArticle(article)"
-          :style="article.issueId ? 'cursor: pointer' : ''">
-          <div class="image-container">
-            <img v-if="article.image && article.image.file" :src="article.image.file" :alt="article.title"
-            class="article-image" />
-            <button class="view-button">
-              <span>View&nbsp;Article</span>
-              <img :src="linkArrow" alt="Arrow Icon" class="arrow-icon" />
+    <div v-if="articles.length" class="selected-articles-container" style="margin-top: 20px;">
+      <h2 style="color: rgb(112, 112, 112);">Selected Articles</h2>
+
+      <div class="selected-articles-grid">
+        <div v-for="article in articles" :key="article.id" class="selected-article-card">
+          <div class="selected-article-body">
+            <h3 class="selected-article-title">{{ article.title }}</h3>
+            <div class="selected-article-description" v-html="article.description"></div>
+            <div class="selected-article-tags" v-if="article.tags?.length">
+              <span v-for="tag in article.tags" :key="tag" class="tag" @click.stop="setKeyword(tag)">#{{ tag }}</span>
+            </div>
+          </div>
+
+          <div class="selected-article-footer">
+            <button class="explore-button" @click.stop="navigateToArticle(article)">
+              Explore
+              <img :src="rightArrow" alt="right arrow" class="explore-icon" />
             </button>
           </div>
-          <h3 class="article-title">{{ article.title }}</h3>
         </div>
       </div>
     </div>
@@ -227,7 +252,6 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 }
 
 .articles-container {
-  padding: 20px;
   margin-bottom: 20px;
   text-align: left;
 }
@@ -243,7 +267,7 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
   justify-content: center;
   align-items: flex-start;
   gap: 2rem;
-  margin: 2rem auto;
+  margin-bottom: 0px;
 }
 
 .articles-container h2,
@@ -263,7 +287,6 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 }
 
 .article-card {
-  width: 30%;
   flex-shrink: 0;
   text-align: left;
 }
@@ -442,5 +465,116 @@ img {
 
 .articles-container h2 {
   text-align: center;
+}
+
+.selected-articles-container {
+  margin-bottom: 40px;
+}
+
+.standard-button {
+  background: var(--theme-2);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Barlow Condensed'
+}
+
+.selected-article-title {
+  margin-top: 10px;
+  margin-bottom: 0px;
+  cursor: default;
+}
+
+.selected-articles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.selected-article-card {
+  background-color: var(--theme-1);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 0.25rem rgb(128, 128, 128));
+  padding: 5px 15px 15px 15px;
+}
+
+.selected-article-description {
+  line-height: 1.6;
+  font-size: 1rem;
+  color: white;
+  text-align: left;
+  min-height: 30px;
+  margin: 0;
+  cursor: default;
+}
+
+.selected-article-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--theme-2);
+  border-radius: 8px;
+  padding: 3px 8px;
+  cursor: pointer;
+  color: white;
+}
+
+.selected-article-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-article-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.explore-button {
+  background-color: var(--theme-2);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Barlow Condensed';
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.explore-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  margin-top: 3px;
+}
+
+.explore-button:hover,
+.tag:hover,
+.standard-button:hover,
+.explore-button:hover,
+.view-button:hover {
+  background-color: var(--theme-3);
 }
 </style>
