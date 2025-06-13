@@ -140,7 +140,7 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
   </div>
   <div v-else id="home-container">
     <!-- render the home page description -->
-    <div v-html="description"></div>
+    <div class="home-description" v-html="description"></div>
 
     <!-- Render the carousel -->
     <div v-if="issues.length" class="carousel-container">
@@ -227,6 +227,13 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 </template>
 
 <style scoped>
+.home-description {
+  max-width: 1200px;
+  width: 90%;
+  margin: 20px auto;
+  text-align: left;
+}
+
 .loader {
   width: 50px;
   height: 50px;
@@ -330,8 +337,11 @@ h3 {
   background-color: var(--theme-1);
   position: relative;
   padding: 20px;
-  margin-top: 20px;
+  margin: 20px auto;
   border-radius: 8px;
+  max-width: 1500px;
+  width: 90%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12)
 }
 
 .toggle-overlay-btn {
@@ -358,6 +368,10 @@ img {
 
 .image-container:hover img {
   transform: scale(1.05);
+}
+
+.selected-article-card:hover {
+    transform: scale(1.03);
 }
 
 .view-button {
@@ -492,7 +506,9 @@ img {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 40px;
-  margin-top: 20px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 20px auto 0 auto;
 }
 
 .selected-article-card {
@@ -505,6 +521,7 @@ img {
   overflow: visible;
   filter: drop-shadow(0 0 0.25rem rgb(128, 128, 128));
   padding: 5px 15px 15px 15px;
+  transition: transform 0.3s ease;
 }
 
 .selected-article-description {
