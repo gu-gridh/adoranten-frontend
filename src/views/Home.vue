@@ -144,7 +144,7 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 
     <!-- Render the carousel -->
     <div v-if="issues.length" class="carousel-container">
-      <h2 style="margin-bottom: 5px; margin-top: 0px">Issues</h2>
+      <h2 style="margin-bottom: 5px; margin-top: 5px">Issues</h2>
       <div class="view-toggle-buttons" style="margin-bottom: 10px;">
         <button class="standard-button" @click="toggleOverlay">Show as a list</button>
       </div>
@@ -174,52 +174,46 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
       <p>No issues found</p>
     </div>
 
-    <h2 v-if="latestIssue" class="latest-title">Latest Issue: {{ latestIssue.title }}</h2>
-    <div v-if="latestIssue" class="latest-container">
-      <div class="image-container" @click="navigateToIssue(latestIssue)">
-        <img ref="coverImg" :src="latestIssue.image.file" :alt="latestIssue.image.title" class="cover-image"
-          @load="onImageLoad" />
-        <button class="view-button">
-          <span>View&nbsp;Issue</span>
-          <img :src="linkArrow" alt="Arrow Icon" class="arrow-icon" />
-        </button>
-      </div>
+    <div class="home-main">
+      <section class="latest-col">
+        <h2 class="latest-title">Latest Issue: {{ latestIssue.title }}</h2>
 
-      <div class="text-column" :class="{ expanded: expandedLatest }">
-        <div class="text-wrapper" ref="textWrapper"
-          :style="expandedLatest ? {} : { maxHeight: (coverHeight - 25) + 'px' }">
-          <p v-html="latestIssue.description"></p>
+        <div class="latest-card" @click="navigateToIssue(latestIssue)">
+          <img ref="coverImg" :src="latestIssue.image.file" :alt="latestIssue.image.title" class="cover-image"
+            @load="onImageLoad" />
+
+          <div class="latest-desc" v-html="latestIssue.description"></div>
+
+          <button class="view-button">
+            <span>View&nbsp;Issue</span>
+            <img :src="linkArrow" alt="" class="arrow-icon" />
+          </button>
         </div>
+      </section>
 
-        <div v-if="showExpandToggle" class="expand-toggle" @click.stop="toggleExpand">
-          <span v-if="!expandedLatest">[+ Read more]</span>
-          <span v-else>[- Show less]</span>
-        </div>
-      </div>
-    </div>
+      <!-- right: selected articles -->
+      <section class="articles-col">
+        <h2 class="articles-title">Selected Articles</h2>
 
-    <!-- Articles Display -->
-    <div v-if="articles.length" class="selected-articles-container" style="margin-top: 20px;">
-      <h2 style="color: rgb(112, 112, 112);">Selected Articles</h2>
+        <div class="selected-articles-grid">
+          <div v-for="article in articles" :key="article.id" class="selected-article-card">
+            <div class="selected-article-body">
+              <h3 class="selected-article-title">{{ article.title }}</h3>
+              <div class="selected-article-description" v-html="article.description"></div>
+              <div class="selected-article-tags" v-if="article.tags?.length">
+                <span v-for="tag in article.tags" :key="tag" class="tag" @click.stop="setKeyword(tag)">#{{ tag }}</span>
+              </div>
+            </div>
 
-      <div class="selected-articles-grid">
-        <div v-for="article in articles" :key="article.id" class="selected-article-card">
-          <div class="selected-article-body">
-            <h3 class="selected-article-title">{{ article.title }}</h3>
-            <div class="selected-article-description" v-html="article.description"></div>
-            <div class="selected-article-tags" v-if="article.tags?.length">
-              <span v-for="tag in article.tags" :key="tag" class="tag" @click.stop="setKeyword(tag)">#{{ tag }}</span>
+            <div class="selected-article-footer">
+              <button class="explore-button" @click.stop="navigateToArticle(article)">
+                Explore
+                <img :src="rightArrow" alt="right arrow" class="explore-icon" />
+              </button>
             </div>
           </div>
-
-          <div class="selected-article-footer">
-            <button class="explore-button" @click.stop="navigateToArticle(article)">
-              Explore
-              <img :src="rightArrow" alt="right arrow" class="explore-icon" />
-            </button>
-          </div>
         </div>
-      </div>
+      </section>
     </div>
 
     <Overlay :show="showOverlay" :issues="issues" @close="toggleOverlay" />
@@ -227,10 +221,74 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 </template>
 
 <style scoped>
-.home-description {
-  max-width: 1200px;
-  width: 90%;
+#home-container {
+  width: 80%;
+  max-width: 85vw;
   margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-main {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+.latest-col {
+  flex: 0 0 30%;
+}
+
+.articles-col {
+  flex: 1 0 70%;
+}
+
+.latest-title,
+.articles-title {
+  text-align: left;
+  color: var(--theme-2);
+  margin-bottom: 1rem;
+}
+
+.latest-card {
+  position: relative;
+  cursor: pointer;
+}
+
+.cover-image {
+  width: 100%;
+  border-radius: 8px;
+  transition: transform .3s ease,
+    filter .3s ease;
+}
+
+.latest-card:hover .cover-image {
+  transform: scale(1.03);
+  filter: brightness(0.35);
+}
+
+.latest-desc {
+  position: absolute;
+  inset: 0;
+  padding: 0px;
+  overflow-y: auto;
+  background: transparent;
+  color: #fff;
+  opacity: 0;
+  transition: opacity .25s ease;
+  border-radius: inherit;
+  font-size: .95rem;
+}
+
+.latest-card:hover .latest-desc {
+  opacity: 1;
+}
+
+.home-description {
+  max-width: 70%;
+  width: 90%;
   text-align: left;
 }
 
@@ -240,81 +298,14 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
   margin: 0 auto;
 }
 
-.cover-image {
-  height: auto;
-  object-fit: contain;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  width: 300px;
-  flex-shrink: 0;
-}
-
-.text-column {
-  width: 300px;
-  text-overflow: ellipsis;
-  text-align: left;
-  margin-left: 2rem;
-  margin-top: 0rem;
-}
-
-.articles-container {
-  margin-bottom: 20px;
-  text-align: left;
-}
-
 .latest-title {
   color: var(--theme-2);
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.latest-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 2rem;
-  margin-bottom: 0px;
-}
-
-.articles-container h2,
-.articles-container .article-title,
-.latest-container h2 {
-  color: var(--theme-2);
-}
-
-.articles-grid {
-  display: flex;
-  gap: 40px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-  overflow: hidden;
-  width: 100%;
-  justify-content: space-evenly;
-}
-
-.article-card {
-  flex-shrink: 0;
   text-align: left;
 }
 
-.articles-container .image-container img,
-.latest-container .image-container img {
+.image-container img {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
   border-radius: 8px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.article-card:hover .article-image {
-  transform: scale(1.03);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.12);
-}
-
-.article-image {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: 5px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -329,19 +320,13 @@ h3 {
   color: white;
 }
 
-#home-container {
-  margin: 0 10%;
-}
-
 .carousel-container {
-  background-color: var(--theme-1);
-  position: relative;
   padding: 20px;
+  width: 100%;
+  background: var(--theme-1);
   margin: 20px auto;
   border-radius: 8px;
-  max-width: 1500px;
-  width: 90%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12)
+  box-shadow: 0 4px 15px rgba(0, 0, 0, .12);
 }
 
 .toggle-overlay-btn {
@@ -371,7 +356,7 @@ img {
 }
 
 .selected-article-card:hover {
-    transform: scale(1.03);
+  transform: scale(1.01);
 }
 
 .view-button {
@@ -397,11 +382,6 @@ img {
   height: 16px;
 }
 
-.hamburger-icon {
-  width: 40px;
-  height: 40px;
-}
-
 .image-container:hover .view-button {
   opacity: 1;
 }
@@ -409,7 +389,6 @@ img {
 .carousel__slide {
   width: 30% !important;
   margin: 0 5%;
-  /* top no margin, left and right 5% */
 }
 
 .carousel {
@@ -425,63 +404,32 @@ img {
 }
 
 @media screen and (max-width: 768px) {
-  .latest-container {
+  .home-main {
     flex-direction: column;
-    align-items: center;
   }
 
-  .text-column {
-    margin-left: 0;
-    margin-top: 1rem;
-    width: 90%;
-    text-align: center;
+  .latest-col,
+  .articles-col {
+    width: 100%;
+  }
+
+  .carousel-container {
+    padding: 0px;
+  }
+
+  .selected-article-card {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
   }
 
   #home-container>div.carousel-container>section>ol {
     display: none;
   }
-
-  .article-card {
-    width: 100%;
-  }
-}
-
-.latest-container .image-container,
-.article-card .image-container {
-  position: relative;
-}
-
-.article-card:hover .view-button,
-.latest-container .image-container:hover .view-button {
-  opacity: 1;
-}
-
-.latest-container .view-button,
-.article-card .view-button {
-  bottom: 40px;
-}
-
-.text-wrapper {
-  overflow: hidden;
-}
-
-.text-column.expanded .text-wrapper {
-  overflow: visible;
-  max-height: none;
-}
-
-.expand-toggle {
-  cursor: pointer;
-  color: var(--theme-2);
-  margin-top: 0.5rem;
-  text-align: center;
-}
-
-.articles-container h2 {
-  text-align: center;
 }
 
 .selected-articles-container {
+  width: 90%;
+  margin: 0 auto;
   margin-bottom: 40px;
 }
 
@@ -503,25 +451,24 @@ img {
 }
 
 .selected-articles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  display: flex;
   gap: 40px;
   justify-content: center;
-  max-width: 1200px;
-  margin: 20px auto 0 auto;
+  flex-wrap: wrap;
 }
 
 .selected-article-card {
-  background-color: var(--theme-1);
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: calc((100% - 80px)/3);
+  background: var(--theme-1);
   border-radius: 8px;
+  padding: 5px 15px 15px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
-  overflow: visible;
-  filter: drop-shadow(0 0 0.25rem rgb(128, 128, 128));
-  padding: 5px 15px 15px 15px;
-  transition: transform 0.3s ease;
+  transition: transform .3s ease;
+  filter: drop-shadow(0 0 0.25rem rgb(128 128 128));
 }
 
 .selected-article-description {
