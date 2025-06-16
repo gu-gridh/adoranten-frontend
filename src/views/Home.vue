@@ -280,6 +280,12 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
   transition: opacity .25s ease;
   border-radius: inherit;
   font-size: .95rem;
+  scrollbar-width: none;
+ -ms-overflow-style: none; 
+}
+
+.latest-desc::-webkit-scrollbar {
+  display: none;
 }
 
 .latest-card:hover .latest-desc {
