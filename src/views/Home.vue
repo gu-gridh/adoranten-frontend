@@ -20,6 +20,9 @@ const router = useRouter()
 const coverImg = ref(null)
 const coverHeight = ref(0)
 
+const TRUNCATE_LIMIT = 500 //collapsed character limit for article description
+const expandedArticles = ref({})
+
 const expandedLatest = ref(false)
 const showExpandToggle = ref(false)
 const textWrapper = ref(null)
@@ -45,7 +48,6 @@ const carouselConfig = {
 }
 
 const toggleOverlay = () => (showOverlay.value = !showOverlay.value)
-const toggleExpand = () => (expandedLatest.value = !expandedLatest.value)
 
 const navigateToArticle = (article) => {
   if (article.issue_id && article.id) {
@@ -73,6 +75,23 @@ const navigateToIssue = (article) => {
 function setKeyword(tag) {
   store.keyword = tag
   router.push({ name: 'Search' })
+}
+
+function needsExpand(article) {
+  if (!article?.description) return false
+  return article.description.length > TRUNCATE_LIMIT
+}
+
+function displayText(article) {
+  const desc = article.description || ''
+  if (!needsExpand(article)) return desc
+  return expandedArticles.value[article.id]
+    ? desc
+    : desc.slice(0, TRUNCATE_LIMIT) + '…'
+}
+
+function toggleExpand(id) {
+  expandedArticles.value[id] = !expandedArticles.value[id]
 }
 
 onMounted(async () => {
@@ -199,7 +218,14 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
           <div v-for="article in articles" :key="article.id" class="selected-article-card">
             <div class="selected-article-body">
               <h3 class="selected-article-title">{{ article.title }}</h3>
-              <div class="selected-article-description" v-html="article.description"></div>
+              <div class="selected-article-description">
+                <p v-html="displayText(article)"></p>
+              </div>
+
+              <div v-if="needsExpand(article)" class="expand-toggle" @click.stop="toggleExpand(article.id)">
+                <span v-if="!expandedArticles[article.id]">[+ Read more]</span>
+                <span v-else>[- Show less]</span>
+              </div>
               <div class="selected-article-tags" v-if="article.tags?.length">
                 <span v-for="tag in article.tags" :key="tag" class="tag" @click.stop="setKeyword(tag)">#{{ tag }}</span>
               </div>
@@ -221,6 +247,25 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 </template>
 
 <style scoped>
+.selected-article-description p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 1rem;
+  color: white;
+  text-align: left;
+}
+
+.expand-toggle {
+  cursor: pointer;
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.home-description :first-child {
+  margin-top: 0px;
+}
+
 #home-container {
   width: 80%;
   max-width: 85vw;
@@ -281,7 +326,7 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
   border-radius: inherit;
   font-size: .95rem;
   scrollbar-width: none;
- -ms-overflow-style: none; 
+  -ms-overflow-style: none;
 }
 
 .latest-desc::-webkit-scrollbar {
@@ -409,7 +454,7 @@ img {
   background-color: #b02b27 !important;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1024px) {
   .home-main {
     flex-direction: column;
   }
@@ -491,6 +536,7 @@ img {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin-bottom: 10px;
 }
 
 .tag {
