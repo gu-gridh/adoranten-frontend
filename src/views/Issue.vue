@@ -20,7 +20,7 @@ const articles = ref([])
 const issue = ref([])
 const issueId = route.params.id
 const expandedArticles = ref({})
-const TRUNCATE_LIMIT = 300
+const TRUNCATE_LIMIT = 250
 const store = adorantenStore();
 const showCitationBox = ref(null)
 const showIssueDescriptionOverlay = ref(false)
@@ -154,7 +154,7 @@ onMounted(async () => {
     <div class="container">
       <p v-if="!articles.length">No articles found.</p>
       <ul v-else>
-        <li v-for="article in articles" :key="article.id" :id="'article-' + article.id" class="article-list-item">
+        <li v-for="article in articles" :key="article.id" :id="'article-' + article.id" class="article-list-item" :class="{ collapsed: !expandedArticles[article.id] }">
           <div class="article-box">
             <div class="image-container">
               <img v-if="article.image?.meta?.download_url" :src="article.image.meta.download_url"
@@ -381,6 +381,12 @@ ul {
   align-items: flex-start;
 }
 
+ul li { height: auto; }
+
+.article-list-item.collapsed {
+  height: 500px;                  
+}
+
 .article-list-item {
   width: calc(33.333% - 20px);
   box-sizing: border-box;
@@ -581,6 +587,12 @@ button.download-main-button:hover,
 @media (max-width: 600px) {
   .article-list-item {
     width: 100%;
+  }
+  .article-title {
+    font-size: 1rem;
+  }
+  .article-description p {
+    font-size: .8rem;
   }
 }
 
