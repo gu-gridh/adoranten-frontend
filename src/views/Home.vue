@@ -267,7 +267,7 @@ watch([coverHeight, () => latestIssue.value?.description], updateToggle)
 }
 
 #home-container {
-  width: 80%;
+  width: 90%;
   max-width: 85vw;
   margin: 20px auto;
   display: flex;
@@ -506,6 +506,7 @@ img {
   gap: 40px;
   justify-content: center;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .selected-article-card {
