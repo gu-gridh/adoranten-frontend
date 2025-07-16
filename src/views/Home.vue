@@ -43,7 +43,7 @@ const updateToggle = () => nextTick(() => {
 })
 
 const carouselConfig = {
-  itemsToShow: 2.5,
+  itemsToShow: window.innerWidth < 768 ? 1 : 2.5,
   wrapAround: true,
 }
 
@@ -438,8 +438,7 @@ img {
 }
 
 .carousel__slide {
-  width: 30% !important;
-  margin: 0 5%;
+  margin: 0 auto;
 }
 
 .carousel {
