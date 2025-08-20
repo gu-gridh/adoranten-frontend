@@ -44,7 +44,6 @@
   display: flex;
   align-items: flex-end;
   margin-left: 35px;
-  margin-top: 15px;
   font-size: 1.5em;
   line-height: 1.4;
   font-weight: 200;
@@ -111,7 +110,7 @@
 
 .GRIDHLogo {
   float: right;
-  margin-top: 30px;
+  margin-top: 15px;
   width: auto;
   height: auto;
   text-align: left;

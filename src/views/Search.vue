@@ -1,19 +1,20 @@
 <script setup>
 import { ref, onMounted, watch, onUnmounted } from 'vue'
+import loader from '/src/assets/loader.svg'
 import articleIcon from '/src/assets/article.png'
 import issueIcon from '/src/assets/issue.png'
 import { adorantenStore } from '/src/stores/store.js'
 import backButton from '/src/assets/back-button.svg'
 import { useRouter } from 'vue-router'
 
+const loaded = ref(false)
 const router = useRouter()
 const description = ref('Loading...')
 const searchTerm = ref('')
-const allArticles = ref([]) // holds the full list of articles fetched on mount
-const results = ref([]) // filtered results that we display
+const allArticles = ref([]) //holds the full list of articles fetched on mount
+const results = ref([]) //filtered results that we display
 const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type='
-const useLazyLoading = ref(false) // toggle between eager and lazy loading implementations
-
+const useLazyLoading = ref(false) //toggle between eager and lazy loading implementations
 const store = adorantenStore()
 
 function goBack() {
@@ -49,7 +50,7 @@ async function fetchAll(type, fields = '') { //loops through all pages using off
 }
 
 onMounted(async () => {
-  const start = performance.now()
+  // const start = performance.now()
 
   try {
     const responseSearch = await fetch(`${baseURL}home.SearchPage&fields=description`)
@@ -77,15 +78,15 @@ onMounted(async () => {
         ...issues,
         ...articles.map(mapArticle)
       ]
-
-      const end = performance.now();
+      loaded.value = true
+      // const end = performance.now();
       // console.log(`Eager load initial rendering took ${(end - start).toFixed(2)} ms`);
     } catch (error) {
       console.error(error)
+      loaded.value = true
     }
   } else {
-    const end = performance.now()
-    // console.log(`Lazy load initial rendering took ${(end - start).toFixed(2)} ms`)
+    loaded.value = true
   }
 })
 
@@ -168,27 +169,27 @@ watch(() => store.keyword, async newKeyword => {
   </div>
 
   <div class="search-container">
-    <input v-model="searchTerm" type="text" placeholder="Search for issues and articles..." class="search-input" />
-
-    <div v-if="results.length" class="search-results">
-      <div v-for="item in results" :key="item.id" class="search-item">
-        <img v-if="!item.isArticle" :src="issueIcon" alt="Issue Icon" class="search-icon" />
-        <img v-else :src="articleIcon" alt="Article Icon" class="search-icon" />
-        <!-- For normal issues -->
-        <router-link v-if="!item.isArticle" :to="{ name: 'Issue', params: { id: item.id } }">
-          {{ item.title }}
-        </router-link>
-        <!-- For articles -->
-        <router-link v-else-if="item.issueId" class="search-link" :to="{
-          name: 'Issue',
-          params: { id: item.issueId },
-          hash: '#article-' + item.id
-        }">
-          {{ item.title }} (Article)
-        </router-link>
-      </div>
+    <div v-if="!loaded" class="loading-container">
+      <img :src="loader" alt="Loading…" class="loading-spinner" />
     </div>
 
+    <div v-else>
+      <input v-model="searchTerm" type="text" placeholder="Search for issues and articles..." class="search-input" />
+
+      <div v-if="results.length" class="search-results">
+        <div v-for="item in results" :key="item.id" class="search-item">
+          <img v-if="!item.isArticle" :src="issueIcon" alt="Issue Icon" class="search-icon" />
+          <img v-else :src="articleIcon" alt="Article Icon" class="search-icon" />
+          <router-link v-if="!item.isArticle" :to="{ name: 'Issue', params: { id: item.id } }">
+            {{ item.title }}
+          </router-link>
+          <router-link v-else-if="item.issueId" class="search-link"
+            :to="{ name: 'Issue', params: { id: item.issueId }, hash: '#article-' + item.id }">
+            {{ item.title }} (Article)
+          </router-link>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -257,5 +258,13 @@ watch(() => store.keyword, async newKeyword => {
   width: 100%;
 }
 
-.header-text p { margin: 0; }
+.header-text p {
+  margin: 0;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+}
 </style>
