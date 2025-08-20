@@ -16,7 +16,7 @@ const form = reactive({ firstName: '', email: '', message: '' })
 const formType = ref('contact') //contact or submit
 const ctaText = ref('Send')
 const thankYouText = ref('Thanks for your submission.')
-const description = ref('')
+const description = ref('Loading...')
 
 function goBack () {
   const { back } = router.options.history.state || {}
@@ -82,7 +82,8 @@ async function handleSubmit() {
 <template>
     <div class="header-wrapper">
       <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
-      <p v-html="description"></p>
+      <p v-if="formType === 'contact'">This is the about page description</p>
+      <div v-else v-html="description" class="header-text"></div>
     </div>
 
   <div class="contact-form">
@@ -174,4 +175,6 @@ button:hover {
   align-items: center;
   justify-content: center;
 }
+
+.header-text p { margin: 0; }
 </style>

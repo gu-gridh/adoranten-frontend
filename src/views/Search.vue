@@ -164,7 +164,7 @@ watch(() => store.keyword, async newKeyword => {
 <template>
   <div class="header-wrapper">
     <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
-    <p v-html="description"></p>
+    <div v-html="description" class="header-text"></div>
   </div>
 
   <div class="search-container">
@@ -256,4 +256,6 @@ watch(() => store.keyword, async newKeyword => {
   text-decoration: none;
   width: 100%;
 }
+
+.header-text p { margin: 0; }
 </style>
