@@ -11,97 +11,127 @@ const emit = defineEmits(['close'])
 </script>
 
 <template>
-  <div v-if="show" class="overlay">
-    <div class="overlay-content">
-        <img :src="X" alt="Close" class="close-icon" @click="emit('close')" />
-      <div class="title">Issues</div>
-      <div class="issues-list">
-        <router-link
-          v-for="issue in issues"
-          :key="issue.id"
-          :to="{ name: 'Issue', params: { id: issue.id } }"
-          class="issue-item"
-        >
-          <img :src="issueIcon" alt="Issue Icon" class="issue-icon" />
-          Adoranten&nbsp;{{ issue.issue_year }}
-        </router-link>
-      </div>
+  <transition name="fade">
+    <div v-if="show" class="overlay" @click.self="emit('close')">
+      <transition name="slide">
+        <aside class="drawer">
+          <button class="panel-close" @click="emit('close')" aria-label="Close navigation">
+            <img :src="X" alt="" />
+          </button>
+
+          <nav class="issues-list">
+            <router-link v-for="issue in issues" :key="issue.id" :to="{ name: 'Issue', params: { id: issue.id } }"
+              class="issue-item" @click="emit('close')">
+              <img :src="issueIcon" alt="" class="issue-icon" />
+              <span>Adoranten&nbsp;{{ issue.issue_year }}</span>
+            </router-link>
+          </nav>
+        </aside>
+      </transition>
     </div>
-  </div>
+  </transition>
 </template>
 
 <style scoped>
 .overlay {
   position: fixed;
+  inset: 0;
+  background: rgba(0 0 0 /.45);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+}
+
+.drawer {
+  position: fixed;
   top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #707070e8;
+  right: 0;
+  width: clamp(260px, 75vw, 360px);
+  height: 100%;
+  box-sizing: border-box;
+  background: #fff;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000; /* above everything */
+  flex-direction: column;
+  padding-top: 56px;
+  overflow: hidden;
+  box-shadow: -4px 0 14px rgba(0, 0, 0, .2);
+  overflow-x: hidden;
 }
 
-.close-icon {
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform .3s ease;
+}
+
+.panel-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: auto;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  padding: 0;
   cursor: pointer;
-  transition: transform 0.25s ease-in-out;
+  transition: transform .25s ease-in-out;
 }
 
-.overlay-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 30%;
-  min-height: 50vh;
-  text-align: center;
-  position: relative;
-}
-
-.close-icon:hover {
+.panel-close:hover {
   transform: scale(1.1);
 }
 
-.title {
-  font-size: 28px;
+.panel-close img {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .issues-list {
-  margin-top: 1rem;
-  max-height: 60vh;
+  flex: 1 1 auto;
   overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+  padding-bottom: 32px;
+  overflow-x: hidden;
 }
 
 .issue-item {
-  font-size: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #e0e0e0;
-  color: inherit;
+  padding: 14px 24px;
   text-decoration: none;
-  transition: background 0.2s ease-in-out;
-  text-align: center;
-  justify-content: center; 
-  position: relative;
+  color: inherit;
+  transition: background .2s;
+}
+
+.issue-item:not(:last-child) {
+  border-bottom: 1px solid #ececec;
+}
+
+.issue-item:hover {
+  background: #e2e2e2;
 }
 
 .issue-icon {
   width: 24px;
-  height: auto;
-  position: absolute; 
-  left: 0;
-}
-
-.issue-item:hover {
-  background: #f0f0f0;
 }
 </style>

@@ -3,21 +3,21 @@
     <div id="developer-info">
       <div class="links-stack">
         <a class="site-link link"
-          href=""
+          href="https://github.com/gu-gridh/adoranten-frontend"
           target="_blank">GitHub
           repositories and development</a>
-        <a class="site-link link" href=""
+        <a class="site-link link" href="https://github.com/gu-gridh/adoranten"
           target="_blank">Database and API documentation</a>
       </div>
       <!-- <div class="links-stack border-style">
         <a class="site-link link" href=""
           target="_blank">Dataset documentation</a>
       </div> -->
-      <div class="links-stack border-style extra">
+      <!-- <div class="links-stack border-style extra">
         <a class="site-link link" href=""
           target="_blank">Project team</a>
         <a class="site-link link" href="" target="_blank">Feedback form</a>
-      </div>
+      </div> -->
     </div>
     <div class="partners">
       <a href="https://dh.gu.se/">
@@ -44,7 +44,6 @@
   display: flex;
   align-items: flex-end;
   margin-left: 35px;
-  margin-top: 15px;
   font-size: 1.5em;
   line-height: 1.4;
   font-weight: 200;
@@ -111,7 +110,7 @@
 
 .GRIDHLogo {
   float: right;
-  margin-top: 30px;
+  margin-top: 15px;
   width: auto;
   height: auto;
   text-align: left;
@@ -140,6 +139,12 @@ a:hover {
 @media (max-width: 768px) {
   #footer {
     padding: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  #footer {
+    display: none;
   }
 }
 </style>

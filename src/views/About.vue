@@ -16,13 +16,11 @@ const form = reactive({ firstName: '', email: '', message: '' })
 const formType = ref('contact') //contact or submit
 const ctaText = ref('Send')
 const thankYouText = ref('Thanks for your submission.')
+const description = ref('Loading...')
 
-function goBack() {
-  if (window.history.length > 2) {
-    history.back()
-  } else {
-    router.push({name: 'Home' })
-  }
+function goBack () {
+  const { back } = router.options.history.state || {}
+  back ? router.back() : router.push({ name: 'Home' })
 }
 
 async function fetchFormData() {
@@ -39,6 +37,7 @@ async function fetchFormData() {
     ctaText.value = formType.value === 'submit' ? submitLabel : contactLabel
 
     thankYouText.value = page.thank_you_text.replace(/<[^>]+>/g, '').trim()
+    description.value = page.intro || '' 
   } catch (err) {
     console.error(err)
   }
@@ -83,7 +82,8 @@ async function handleSubmit() {
 <template>
     <div class="header-wrapper">
       <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
-      <p v-html="description"></p>
+      <p v-if="formType === 'contact'">This is the about page description</p>
+      <div v-else v-html="description" class="header-text"></div>
     </div>
 
   <div class="contact-form">
@@ -116,7 +116,14 @@ async function handleSubmit() {
 .contact-form {
   max-width: 400px;
   margin: 40px auto;
-  padding: 15px;
+  margin-top: 0px;
+}
+
+@media (max-width: 600px) {
+  .contact-form {
+    max-width: 90%;
+    padding: 0 10px;
+  }
 }
 
 .form-group-name {
@@ -169,11 +176,5 @@ button:hover {
   justify-content: center;
 }
 
-.back-button {
-  position: absolute;
-  left: 25px;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-}
+.header-text p { margin: 0; }
 </style>

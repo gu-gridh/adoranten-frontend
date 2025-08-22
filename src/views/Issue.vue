@@ -1,34 +1,36 @@
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { adorantenStore } from "/src/stores/store.js";
+import loader from '/src/assets/loader.svg' 
 import linkArrow from '/src/assets/link-arrow.png'
 import rightArrow from '/src/assets/right-arrow.png'
 import downArrow from '/src/assets/down-arrow.png'
 import backButton from '/src/assets/back-button.svg'
 import infoIcon from '/src/assets/info.svg'
 import closeIcon from '/src/assets/close.svg'
-import { adorantenStore } from "/src/stores/store.js";
 
-// access the current route
+//access the current route
 const route = useRoute()
 const router = useRouter()
 const baseURL = 'https://shfa.dh.gu.se/wagtail/api/v2/pages/?type=journal.'
 const expandedArticleId = ref(null)
+const loading = ref(true)
 const articles = ref([])
 const issue = ref([])
 const issueId = route.params.id
 const expandedArticles = ref({})
-const TRUNCATE_LIMIT = 300
+const TRUNCATE_LIMIT = 250
 const store = adorantenStore();
 const showCitationBox = ref(null)
 const showIssueDescriptionOverlay = ref(false)
-const hasDescription  = computed( //check if the issue has a description
-() => issue.value?.description && issue.value.description.trim() !== '')
+const hasDescription = computed( //check if the issue has a description
+  () => issue.value?.description && issue.value.description.trim() !== '')
 
 function downloadCitation(articleTitle, format) {
   const sanitizedTitle = articleTitle.replace(/\s+/g, '_')
   const fileName = `${sanitizedTitle}.${format}`
-  const citationText = `citation for "${articleTitle}" in a .${format} file.`
+  const citationText = `${articleTitle}"`
   const blob = new Blob([citationText], { type: 'text/plain' })  //blob is a file-like object of raw data
 
   //create a temporary link to trigger the download because blobs can't be downloaded directly
@@ -47,8 +49,9 @@ function toggleCitation(articleId) {
   }
 }
 
-function goBack() { //back one step in history
-  history.back()
+function goBack() {
+  const { back } = router.options.history.state || {}
+  back ? router.back() : router.push({ name: 'Home' })
 }
 
 function toggleDownload(articleId) {
@@ -117,6 +120,8 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('error fetching issue full pdf:', error)
+  } finally {
+    loading.value = false 
   }
 
   //after data is loaded, scroll to hash if present
@@ -131,10 +136,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div v-if="loading" class="loader-wrapper">
+    <img :src="loader" alt="Loading…" class="loader" />
+  </div>
+  <div v-else>
     <div class="header-wrapper">
       <img :src="backButton" alt="Back" class="back-button" @click="goBack" />
-      <h2>{{ issue.title }} <img v-if="hasDescription" :src="infoIcon" alt="Info" class="info-icon" @click="showIssueDescription" /></h2>
+      <h2>{{ issue.title }} <img v-if="hasDescription" :src="infoIcon" alt="Info" class="info-icon"
+          @click="showIssueDescription" /></h2>
     </div>
     <h3 id="issue-button">
       <a v-if="issue.pdf_file" :href="issue.pdf_file" target="_blank">
@@ -145,7 +154,7 @@ onMounted(async () => {
     <div class="container">
       <p v-if="!articles.length">No articles found.</p>
       <ul v-else>
-        <li v-for="article in articles" :key="article.id" :id="'article-' + article.id" class="article-list-item">
+        <li v-for="article in articles" :key="article.id" :id="'article-' + article.id" class="article-list-item" :class="{ collapsed: !expandedArticles[article.id] }">
           <div class="article-box">
             <div class="image-container">
               <img v-if="article.image?.meta?.download_url" :src="article.image.meta.download_url"
@@ -182,7 +191,8 @@ onMounted(async () => {
 
                 <div class="button-group">
                   <div class="download-dropdown">
-                    <button class="download-main-button" :class="{ 'disabled-button': !article.citation }" @click.stop="toggleDownload(article.id)">
+                    <button class="download-main-button" :class="{ 'disabled-button': !article.citation }"
+                      @click.stop="toggleDownload(article.id)">
                       <span>Download Citation</span>
                       <img :src="rightArrow" alt="Toggle Download Options" class="arrow-icon" />
                     </button>
@@ -192,7 +202,8 @@ onMounted(async () => {
                     </div>
                   </div>
 
-                  <button class="download-main-button" :class="{ 'disabled-button': !article.citation }" @click="toggleCitation(article.id)">
+                  <button class="download-main-button" :class="{ 'disabled-button': !article.citation }"
+                    @click="toggleCitation(article.id)">
                     <span>Copy Citation</span>
                     <img :src="downArrow" alt="Toggle Citation Box" class="arrow-icon" />
                   </button>
@@ -210,61 +221,113 @@ onMounted(async () => {
         </li>
       </ul>
     </div>
-    <div v-if="showIssueDescriptionOverlay" class="overlay">
-      <div class="overlay-content">
-        <img :src="closeIcon" alt="Close" class="close-icon" @click="toggleOverlay" />
-        <h2>Issue Description</h2>
-        <div>
-          <div v-if="issue.description" v-html="issue.description"></div>
-        </div>
+    <transition name="fade">
+      <div v-if="showIssueDescriptionOverlay" class="backdrop" @click.self="toggleOverlay">
+        <transition name="slide">
+          <aside class="desc-drawer">
+            <button class="drawer-close" @click="toggleOverlay" aria-label="Close">
+              <img :src="closeIcon" alt="" />
+            </button>
+            <div class="desc-scroll">
+              <div v-if="issue.description" v-html="issue.description"></div>
+              <p v-else>No description for this issue.</p>
+            </div>
+          </aside>
+        </transition>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
 <style scoped>
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0 0 0 /.45);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+}
+
+.desc-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: clamp(260px, 75vw, 360px);
+  max-height: 100dvh;
+  background: #fff;
+  box-shadow: -4px 0 14px rgba(0,0,0,.2);
+  display: flex;
+  flex-direction: column;
+  padding-top: 56px;
+}
+
+.desc-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 24px 32px;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+  text-align: left;
+}
+
+.desc-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.desc-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.desc-scroll::-webkit-scrollbar-thumb {
+  background: #ccc;
+}
+
+.drawer-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform .25s ease-in-out;
+}
+
+.drawer-close:hover {
+  transform: scale(1.1);
+}
+
+.drawer-close img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform .3s ease;
+}
+
 .disabled-button {
   pointer-events: none;
   opacity: 0.5;
 }
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #707070e8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.overlay-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 30%;
-  min-height: 50vh;
-  text-align: left;
-  position: relative;
-}
-
-.close-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: auto;
-  cursor: pointer;
-  transition: transform 0.25s ease-in-out;
-}
-
-.close-icon:hover {
-  transform: scale(1.1);
-}
-
 
 .image-container {
   position: relative;
@@ -291,6 +354,10 @@ onMounted(async () => {
   font-size: 1rem;
 }
 
+.pdf-button:hover {
+  background-color: var(--theme-3);
+}
+
 .pdf-button .arrow-icon {
   width: 20px;
   height: 20px;
@@ -312,6 +379,12 @@ ul {
   flex-wrap: wrap;
   gap: 20px;
   align-items: flex-start;
+}
+
+ul li { height: auto; }
+
+.article-list-item.collapsed {
+  height: 500px;                  
 }
 
 .article-list-item {
@@ -352,8 +425,7 @@ ul {
 }
 
 .article-title {
-  min-height: 48px;
-  margin: 0 0 8px 0;
+  margin-bottom: 0px;
 }
 
 .article-description p {
@@ -369,7 +441,7 @@ ul {
   cursor: pointer;
   color: #fff;
   font-weight: bold;
-  margin: 5px 0;
+  margin-bottom: 12px;
 }
 
 .bottom-bar {
@@ -388,25 +460,31 @@ ul {
 
 .tags-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .keyword-tag {
-  background: grey;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--theme-2);
   border-radius: 8px;
   padding: 3px 8px;
   cursor: pointer;
-}
-
-.keyword-tag:hover {
-  background: #fff;
-  color: #000;
 }
 
 .download-dropdown {
   position: relative;
   display: inline-flex;
   align-items: center;
+}
+
+button.download-main-button:hover,
+.keyword-tag:hover {
+  background-color: var(--theme-3);
 }
 
 .download-main-button {
@@ -488,12 +566,16 @@ ul {
   justify-content: center;
 }
 
-.back-button {
-  position: absolute;
-  left: 25px;
-  width: 30px;
-  height: 30px;
+.info-icon {
+  display: inline-block;
+  height: 1em;
+  vertical-align: middle;
+  margin-left: .35em;
   cursor: pointer;
+}
+
+.info-icon:hover {
+  transform: scale(1.1);
 }
 
 @media (max-width: 1024px) {
@@ -506,5 +588,17 @@ ul {
   .article-list-item {
     width: 100%;
   }
+  .article-title {
+    font-size: 1rem;
+  }
+  .article-description p {
+    font-size: .8rem;
+  }
+}
+
+.loader {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
 }
 </style>
